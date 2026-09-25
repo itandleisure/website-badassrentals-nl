@@ -38,6 +38,8 @@ RewriteRule ^(red-flu-escape-koffer|la-casa-de-dinero-vr-escape-experience|virtu
 RewriteRule ^(interactieve-wandeling-door-meppel|interactieve-wandeling-meppel|interactieve-wandeling-door-steenwijk|interactieve-wandeling-steenwijk)/?$ / [R=301,L,NC]
 # Oude blogberichten die niet meer actueel zijn
 RewriteRule ^(het-beste-corona-proof-uitje-in-de-regio)/?$ /nieuws/ [R=301,L,NC]
+# Cadeaubonnen worden niet meer verkocht
+RewriteRule ^geef-een-badass-cadeaubon/?$ /arrangementen/ [R=301,L,NC]
 RewriteRule ^(feed|comments/feed|category/.*|author/.*)/?$ /nieuws/ [R=301,L,NC]
 # Voorwaarden-PDF's
 RewriteRule ^wp-content/uploads/badass-rentals-algemene-voorwaarden-v1\.2-NL\.pdf$ /assets/docs/badass-rentals-algemene-voorwaarden-v1.2-NL.pdf [R=301,L,NC]

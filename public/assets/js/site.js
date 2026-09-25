@@ -42,6 +42,16 @@
     });
   });
 
+  // Link naar een antwoord in een ingeklapte FAQ (#anker): vraag openklappen
+  function openHashTarget() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var t = id && document.getElementById(id);
+    var d = t && t.closest('details');
+    if (d) d.open = true;
+  }
+  openHashTarget();
+  window.addEventListener('hashchange', openHashTarget);
+
   // Datum/tijd standaard op nu (huurovereenkomst)
   var dt = document.querySelector('input[type="datetime-local"][data-now]');
   if (dt && !dt.value) {

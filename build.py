@@ -136,8 +136,12 @@ def render_shortcodes(body, page):
         out = ['<div class="faq">']
         for q, a in items:
             q, a = q.strip(), a.strip()
+            anchor = ""
+            m_id = re.match(r"\{#([\w-]+)\}\s*(.*)", q)  # optioneel anker: Q: {#naam} Vraag?
+            if m_id:
+                anchor, q = f' id="{m_id.group(1)}"', m_id.group(2)
             page.setdefault("_faq", []).append((q, a))
-            out.append(f"<details><summary>{q}</summary><div class=\"faq-a\">{a}</div></details>")
+            out.append(f"<details{anchor}><summary>{q}</summary><div class=\"faq-a\">{a}</div></details>")
         out.append("</div>")
         return "\n".join(out)
 
