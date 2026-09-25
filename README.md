@@ -66,9 +66,16 @@ De reviews staan in `build.py` (lijst `REVIEWS`): echte 5-sterren Google-reviews
 
 ## QR-codes op voertuigen
 
-De URL's `/verhuur-e-chopper-nummer-X-met-kenteken-.../`, `/verhuur-fatbikes-algemene-voorwaarden/`,
+De URL's `/algemene-voorwaarden/verhuur-e-chopper-nummer-X-met-kenteken-.../`, `/algemene-voorwaarden/verhuur-fatbikes-algemene-voorwaarden/`,
 `/qrcode/`, `/qr-code-nederlands|engels|duits/` en `/instagram/` zijn exact behouden, zodat bestaande
 QR-stickers en de Instagram-bio blijven werken. Nieuwe e-chopper? Voeg een regel toe aan `vehicles.py`.
+
+## Controles
+
+```bash
+python tools/seo_audit.py                 # titels, descriptions, H1, alt, canonicals, sitemap, interne links
+python tools/check_live.py                # na livegang: komen alle 107 oude URL's goed uit?
+```
 
 ## Oude URL's
 

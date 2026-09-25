@@ -150,7 +150,7 @@ def render_shortcodes(body, page):
     body = re.sub(r"\{%\s*reviews\s*%\}", lambda m: reviews_html(), body)
     body = re.sub(r"\{%\s*cta\s*%\}", lambda m: cta_html(), body)
     body = re.sub(r"\{%\s*usps\s*%\}", lambda m: usps_html(), body)
-    body = re.sub(r"\{%\s*news\s*%\}", lambda m: news_html(), body)
+    body = re.sub(r"\{%\s*news\s*(\d*)\s*%\}", lambda m: news_html(int(m.group(1)) if m.group(1) else None), body)
     return body
 
 
@@ -206,18 +206,41 @@ def cta_html():
 </section>"""
 
 
-NEWS = []  # gevuld tijdens build: (url, titel, beschrijving, foto, datum)
+NEWS = []  # gevuld tijdens build: (url, titel, beschrijving, foto, datum, onderwerp)
+
+# Per onderwerp de belangrijkste pagina om naartoe te linken vanuit een artikel
+TOPIC_LINKS = {
+    "omgeving": ("/e-chopper-huren-giethoorn/", "e-chopper huren in Giethoorn", "/fat-bike-huren-in-giethoorn/", "een fatbike huren"),
+    "groepen": ("/teamuitje-met-echopper/", "teamuitjes in Giethoorn", "/arrangementen/", "onze arrangementen"),
+    "beleving": ("/e-chopper-huren-giethoorn/", "e-chopper huren in Giethoorn", "/arrangementen/", "onze arrangementen"),
+}
 
 
-def news_html():
-    cards = []
-    for url, title, desc, photo, d in sorted(NEWS, key=lambda n: n[4], reverse=True):
-        cards.append(
-            f'<a class="card" href="{url}">{img_tag(photo, "", "(max-width: 700px) 100vw, 33vw", "card-img")}'
+def card_html(url, title, desc, photo):
+    return (f'<a class="card" href="{url}">{img_tag(photo, "", "(max-width: 700px) 100vw, 33vw", "card-img")}'
             f'<div class="card-body"><h3>{html.escape(title)}</h3><p>{html.escape(desc)}</p>'
-            f'<span class="link-arrow">Lees verder</span></div></a>'
-        )
-    return '<div class="cards">' + "".join(cards) + "</div>"
+            f'<span class="link-arrow">Lees verder</span></div></a>')
+
+
+def news_html(limit=None):
+    items = sorted(NEWS, key=lambda n: n[4], reverse=True)[:limit]
+    return '<div class="cards">' + "".join(card_html(u, t, d, p) for u, t, d, p, _, _ in items) + "</div>"
+
+
+def related_html(path, topic):
+    """'Lees ook' onder een artikel: eerst artikelen met hetzelfde onderwerp, aangevuld met de nieuwste."""
+    # Binnen het onderwerp rouleren (de volgende 3 in de lijst), zodat elk artikel links krijgt
+    same = sorted((n for n in NEWS if n[5] == topic), key=lambda n: n[0])
+    i = next(k for k, n in enumerate(same) if n[0] == path)
+    picks = [same[(i + k) % len(same)] for k in range(1, min(4, len(same)))]
+    others = sorted((n for n in NEWS if n[0] != path and n not in picks), key=lambda n: n[4], reverse=True)
+    picks += others[: 3 - len(picks)]
+    a_url, a_txt, b_url, b_txt = TOPIC_LINKS.get(topic, TOPIC_LINKS["beleving"])
+    return (f'<section class="section section-alt"><div class="wrap">'
+            f'<p class="prose" style="margin:0 auto 36px;font-size:1.1rem">Zelf op pad? Lees alles over '
+            f'<a href="{a_url}">{a_txt}</a> of bekijk <a href="{b_url}">{b_txt}</a>.</p>'
+            f'<h2>Lees ook</h2><div class="cards">'
+            + "".join(card_html(u, t, d, p) for u, t, d, p, _, _ in picks) + "</div></div></section>")
 
 
 # --------------------------------------------------------------------------- layout
@@ -428,7 +451,7 @@ def write_page(path, content):
 
 
 def vehicle_pages():
-    """Digitale huurovereenkomsten achter de QR-codes op de voertuigen (URL's van de oude site)."""
+    """Digitale huurovereenkomsten achter de QR-codes op de voertuigen (/algemene-voorwaarden/verhuur-.../, zoals op de oude site)."""
     tpl = (SRC / "templates" / "huurovereenkomst.html").read_text(encoding="utf-8")
     pages = []
     for nr, plate in ECHOPPERS:
@@ -445,7 +468,8 @@ def vehicle_pages():
         meta = {"title": f"Huurovereenkomst {label} | Badass Rentals",
                 "description": f"Digitale huurovereenkomst voor {label.lower()} van Badass Rentals in Giethoorn.",
                 "noindex": True, "body_class": "page-plain"}
-        out.append((f"/{slug}/", meta, body))
+        # Zelfde pad als op de oude WordPress-site (subpagina van /algemene-voorwaarden/): hier wijzen de QR-codes naar
+        out.append((f"/algemene-voorwaarden/{slug}/", meta, body))
     return out
 
 
@@ -482,12 +506,15 @@ def main():
         meta, body = parse_page(f.read_text(encoding="utf-8"))
         pages.append((page_path(f), meta, body))
         if meta.get("article"):
-            NEWS.append((page_path(f), meta.get("h1", meta["title"]), meta["description"], meta["image"], meta["date"]))
+            NEWS.append((page_path(f), meta.get("h1", meta["title"]), meta["description"], meta["image"], meta["date"],
+                         meta.get("topic", "beleving")))
     pages += vehicle_pages()
 
     print("Pagina's...")
     sitemap = []
     for path, meta, body in pages:
+        if meta.get("article"):
+            body += related_html(path, meta.get("topic", "beleving"))
         rendered = render_shortcodes(body, meta)
         write_page(path, layout(meta, rendered, path))
         if not meta.get("noindex"):
