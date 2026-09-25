@@ -48,6 +48,20 @@ als CSV bewaard in `../huurovereenkomsten/` (buiten de webroot) of anders in `pr
 Vereist PHP 7.4+ met werkende `mail()`. Zorg dat SPF/DKIM voor badassrentals.nl de webserver toestaat,
 anders kunnen mails in spam belanden.
 
+## Google-reviews (live)
+
+`/reviews.php` haalt via de Google Places API (New) de beoordeling, het aantal reviews en de
+recentste reviews (4-5 sterren, met tekst) op en cachet dat 24 uur in `private/`.
+De site toont ze automatisch; werkt de koppeling niet, dan blijven de vaste reviews uit `build.py` staan.
+
+Eenmalig instellen op de server:
+1. Maak in Google Cloud een API-sleutel en zet **Places API (New)** aan. Beperk de sleutel tot die API.
+2. Kopieer `private/config.example.php` naar `private/config.php` en vul `google_api_key` in
+   (optioneel `google_place_id`; leeg = automatisch zoeken op "Badass Rentals Giethoorn").
+3. Let op bij uploaden: overschrijf of verwijder `private/config.php` op de server niet.
+
+Google levert via de API maximaal 5 reviews per keer; bij 1 aanroep per dag valt dit ruim binnen het gratis tegoed.
+
 ## QR-codes op voertuigen
 
 De URL's `/verhuur-e-chopper-nummer-X-met-kenteken-.../`, `/verhuur-fatbikes-algemene-voorwaarden/`,

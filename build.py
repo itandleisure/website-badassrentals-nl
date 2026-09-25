@@ -167,12 +167,14 @@ def reviews_html():
         f"<blockquote>{html.escape(t)}</blockquote><figcaption>{html.escape(n)}</figcaption></figure>"
         for n, t in REVIEWS
     )
-    return f'<div class="reviews">{cards}</div>'
+    # Statische reviews zijn de fallback; site.js vervangt ze door live Google-reviews via /reviews.php
+    return (f'<div class="reviews-wrap" data-google-reviews><p class="reviews-summary" hidden></p>'
+            f'<div class="reviews">{cards}</div></div>')
 
 
 def usps_html():
     items = [
-        ("30+ e-choppers & 15 fatbikes", "Groot genoeg voor kleine en grote groepen, ook 100+ personen."),
+        ("30+ e-choppers & 15 fatbikes", "Voor kleine en grote groepen; boven 30 personen met een wisselprogramma."),
         ("Pech onderweg? Wij komen eraan", "We regelen direct vervangend vervoer, zodat je snel weer verder kunt."),
         ("Mooiste routes", "GPS-routes door Giethoorn en Nationaal Park Weerribben-Wieden."),
         ("Goed onderhouden", "We controleren en onderhouden alle tweewielers periodiek."),
