@@ -34,8 +34,10 @@ RewriteRule ^frequently-asked-questions/?$ /veelgestelde-vragen/ [R=301,L,NC]
 RewriteRule ^terms-and-conditions/?$ /algemene-voorwaarden/ [R=301,L,NC]
 RewriteRule ^get-in-touch/?$ /kom-in-contact/ [R=301,L,NC]
 RewriteRule ^(samenwerkende-partijen|alle-voordelen-op-een-rij)/?$ /samenwerking/ [R=301,L,NC]
-# VR, escape en wandelingen (niet meer op deze site)
-RewriteRule ^(red-flu-escape-koffer|interactieve-wandeling-door-meppel|interactieve-wandeling-meppel|interactieve-wandeling-door-steenwijk|interactieve-wandeling-steenwijk|la-casa-de-dinero-vr-escape-experience|virtual-reality-escape-games)/?$ / [R=301,L,NC]
+# VR en escape (VR wordt niet meer aangeboden) -> arrangementen met City Escape en Detective Game
+RewriteRule ^(red-flu-escape-koffer|la-casa-de-dinero-vr-escape-experience|virtual-reality-escape-games)/?$ /arrangementen/ [R=301,L,NC]
+# Interactieve wandelingen (niet meer op deze site)
+RewriteRule ^(interactieve-wandeling-door-meppel|interactieve-wandeling-meppel|interactieve-wandeling-door-steenwijk|interactieve-wandeling-steenwijk)/?$ / [R=301,L,NC]
 # Oude blogberichten
 RewriteRule ^(nostalgisch-solex-rijden-of-badass-op-een-e-chopper|lekker-uitwaaien-op-een-stoer-elektrisch-scootertje|ga-lekker-cruisen-door-oldemarkt|het-beste-corona-proof-uitje-in-de-regio|geef-een-badass-cadeaubon|combineer-een-avondje-bios-met-een-tocht-op-onze-scooters|verken-de-omgeving-van-kalenberg|stap-op-de-scooter-in-steenwijk|ben-jij-een-badass-voetbalkoning|maak-de-blitz-op-de-donderdag-meppel-dagen|lekker-toeren-in-en-om-havelte-met-onze-elektrische-scooters)/?$ /nieuws/ [R=301,L,NC]
 RewriteRule ^(feed|comments/feed|category/.*|author/.*)/?$ /nieuws/ [R=301,L,NC]
