@@ -1,5 +1,5 @@
 # E-choppers met een QR-code naar hun digitale huurovereenkomst.
-# De URL wordt: /verhuur-e-chopper-nummer-<nr>-met-kenteken-<kenteken>/
+# De URL wordt: /algemene-voorwaarden/verhuur-e-chopper-nummer-<nr>-met-kenteken-<kenteken>/
 # Deze URL's staan op de QR-stickers: bestaande regels niet wijzigen, alleen toevoegen.
 ECHOPPERS = [
     (1, "FGB-58-S"),

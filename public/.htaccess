@@ -19,6 +19,16 @@ RewriteCond %{REQUEST_URI} !/$
 RewriteRule ^(.*)$ /$1/ [R=301,L]
 
 # ---- Oude WordPress-URL's -> nieuwe pagina's (301) ----
+# QR-huurovereenkomsten: korte variant -> echte adres onder /algemene-voorwaarden/ (zoals WordPress deed)
+RewriteRule ^(verhuur-e-chopper-nummer-[0-9]+-met-kenteken-[a-z0-9-]+|verhuur-fatbikes-algemene-voorwaarden)/?$ /algemene-voorwaarden/$1/ [R=301,L,NC]
+# Oude Yoast-sitemaps -> nieuwe sitemap
+RewriteRule ^(sitemap_index|post-sitemap|page-sitemap|blocks-sitemap|category-sitemap|author-sitemap|wp-sitemap)[0-9]*\.xml$ /sitemap.xml [R=301,L,NC]
+# Subpagina's van de oude site
+RewriteRule ^samenwerking/(alle-voordelen-op-een-rij|samenwerkende-partijen)/?$ /samenwerking/ [R=301,L,NC]
+RewriteRule ^leaderboard/.*$ / [R=301,L,NC]
+RewriteRule ^virtual-reality-escape-games/.*$ /arrangementen/ [R=301,L,NC]
+RewriteRule ^blocks/.*$ / [R=301,L,NC]
+RewriteRule ^(tag|product|product-category)/.*$ / [R=301,L,NC]
 # Homepage-varianten en verdwenen landingspagina's
 RewriteRule ^(echopper-verhuur-giethoorn|badassrentals-homepagina|begin-je-badass-ride-in-giethoorn|begin-je-badass-ride-in-blokzijl|begin-je-badass-ride-in-emmeloord|echopper-rental-cast-horn|bakfiets-huren-in-giethoorn-3|media|badass-chopper-game|leaderboard)/?$ / [R=301,L,NC]
 # E-chopper-varianten
