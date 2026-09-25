@@ -1,0 +1,53 @@
+---
+title: Contact | Badass Rentals Giethoorn
+description: Vragen over e-chopper of fatbike huren, een arrangement of teamuitje in Giethoorn? Bel 085 004 7700 of mail info@badassrentals.nl.
+og_title: Contact met Badass Rentals
+image: startlocatie-hollands-venetie-giethoorn
+crumb: Contact
+priority: 0.7
+---
+<section class="section" style="padding-bottom:0">
+  <div class="wrap prose">
+    <h1>Neem contact met ons op</h1>
+    <p class="lead" style="font-size:1.15rem">Een vraag, suggestie of een groepsaanvraag? Vul het formulier in of bel ons. We reageren zo snel mogelijk.</p>
+  </div>
+</section>
+
+<section class="section" id="formulier">
+  <div class="wrap split" style="align-items:start">
+    <div>
+      <ul class="contact-list">
+        <li><strong>Telefoon</strong><a href="tel:{{biz.phone}}">{{biz.phone_display}}</a></li>
+        <li><strong>E-mail</strong><a href="mailto:{{biz.email}}">{{biz.email}}</a></li>
+        <li><strong>Startlocatie</strong>{{biz.location}}<br>{{biz.street}}, {{biz.postal}} {{biz.city}}<br><a class="link-arrow" style="font-size:1rem" href="{{biz.maps}}" rel="noopener">Route plannen</a></li>
+      </ul>
+      <p>Bij de startlocatie is voldoende parkeerplek aanwezig. Wil je vandaag nog huren? Bel of mail ons even, dan kijken we wat er mogelijk is.</p>
+      {% img startlocatie-hollands-venetie-giethoorn "Restaurant Hollands Venetië in Giethoorn, startlocatie van Badass Rentals" sizes="(max-width: 860px) 100vw, 45vw" class="rounded" %}
+    </div>
+    <form class="form js-form" action="/verzenden.php" method="post">
+      <input type="hidden" name="form" value="contact">
+      <input type="hidden" name="page" value="">
+      <input type="hidden" name="ts" value="">
+      <div class="hp" aria-hidden="true"><label>Laat dit veld leeg <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="form-grid">
+        <div class="field full"><label for="c-naam">Naam</label><input id="c-naam" name="naam" autocomplete="name" required></div>
+        <div class="field"><label for="c-email">E-mailadres</label><input id="c-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="c-tel">Telefoonnummer <span class="opt">(optioneel)</span></label><input id="c-tel" name="telefoon" type="tel" autocomplete="tel"></div>
+        <fieldset class="field full">
+          <legend>Ik heb een vraag over <span class="opt">(optioneel)</span></legend>
+          <div class="choices">
+            <label class="choice"><input type="checkbox" name="onderwerp[]" value="E-chopper of fatbike huren"> E-chopper of fatbike huren</label>
+            <label class="choice"><input type="checkbox" name="onderwerp[]" value="Arrangement"> Een arrangement</label>
+            <label class="choice"><input type="checkbox" name="onderwerp[]" value="Teamuitje / groep"> Teamuitje of groep</label>
+            <label class="choice"><input type="checkbox" name="onderwerp[]" value="Samenwerking"> Samenwerking</label>
+            <label class="choice"><input type="checkbox" name="onderwerp[]" value="Bestaande reservering"> Mijn reservering</label>
+            <label class="choice"><input type="checkbox" name="onderwerp[]" value="Overig"> Iets anders</label>
+          </div>
+        </fieldset>
+        <div class="field full"><label for="c-bericht">Je bericht</label><textarea id="c-bericht" name="bericht" required></textarea></div>
+      </div>
+      <p style="margin-top:18px"><button class="btn btn-accent" type="submit">Verstuur bericht</button></p>
+      <p class="form-note">We gebruiken je gegevens alleen om je vraag te beantwoorden. Zie onze <a href="/privacyverklaring/">privacyverklaring</a>.</p>
+    </form>
+  </div>
+</section>
