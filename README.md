@@ -15,7 +15,17 @@ https://verhuur.badassrentals.nl.
 | `src/templates/huurovereenkomst.html` | Sjabloon voor de QR-huurovereenkomst per voertuig |
 | `vehicles.py` | Lijst e-choppers + kentekens (QR-pagina's) |
 | `build.py` | Bouwt alles naar `public/` |
-| `public/` | **De site die online moet.** Upload de inhoud naar de webroot |
+| `public/` | **De site die online moet.** Wordt automatisch uitgerold (zie Uitrollen) |
+
+## Uitrollen (GitHub is leidend)
+
+Elke push naar `main` met wijzigingen in `public/` zet de site automatisch op de Vimexx-hosting via
+FTPS (`.github/workflows/deploy.yml`). Werkwijze: pas `src/` aan, draai `python build.py`, commit en push.
+
+Eenmalig in GitHub instellen (Settings > Secrets and variables > Actions): `FTP_SERVER`, `FTP_USERNAME`,
+`FTP_PASSWORD` en `FTP_DIR` (meestal `/domains/badassrentals.nl/public_html`).
+Er wordt standaard niets verwijderd op de server. Oude bestanden opruimen: Actions > Deploy > Run workflow
+met "opruimen" aangevinkt (huurovereenkomsten en caches blijven staan).
 
 ## Bouwen
 
