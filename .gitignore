@@ -10,3 +10,5 @@ Thumbs.db
 **/private/config.php
 **/private/*.json
 **/private/*.csv
+dev-mail/
+huurovereenkomsten/

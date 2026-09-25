@@ -25,6 +25,18 @@ python build.py            # bouwt naar public/
 python build.py --serve    # bouwen + bekijken op http://localhost:8000
 ```
 
+### Lokaal testen met formulieren (PHP)
+
+PHP 8.4 is lokaal geïnstalleerd (winget). `mail()` stuurt lokaal naar een test-mailserver,
+er gaat dus niets echt de deur uit. Open twee terminals:
+
+```bash
+python tools/mailcatcher.py                 # vangt mails op in dev-mail/*.eml
+php -S localhost:8000 -t public             # site mét werkende formulieren
+```
+
+Getekende huurovereenkomsten komen lokaal in `huurovereenkomsten/` (niet in git).
+
 ## Pagina bewerken
 
 Open het bestand in `src/pages/`. Handige codes:
@@ -48,19 +60,9 @@ als CSV bewaard in `../huurovereenkomsten/` (buiten de webroot) of anders in `pr
 Vereist PHP 7.4+ met werkende `mail()`. Zorg dat SPF/DKIM voor badassrentals.nl de webserver toestaat,
 anders kunnen mails in spam belanden.
 
-## Google-reviews (live)
+## Reviews
 
-`/reviews.php` haalt via de Google Places API (New) de beoordeling, het aantal reviews en de
-recentste reviews (4-5 sterren, met tekst) op en cachet dat 24 uur in `private/`.
-De site toont ze automatisch; werkt de koppeling niet, dan blijven de vaste reviews uit `build.py` staan.
-
-Eenmalig instellen op de server:
-1. Maak in Google Cloud een API-sleutel en zet **Places API (New)** aan. Beperk de sleutel tot die API.
-2. Kopieer `private/config.example.php` naar `private/config.php` en vul `google_api_key` in
-   (optioneel `google_place_id`; leeg = automatisch zoeken op "Badass Rentals Giethoorn").
-3. Let op bij uploaden: overschrijf of verwijder `private/config.php` op de server niet.
-
-Google levert via de API maximaal 5 reviews per keer; bij 1 aanroep per dag valt dit ruim binnen het gratis tegoed.
+De reviews staan in `build.py` (lijst `REVIEWS`): echte 5-sterren Google-reviews. Nieuwe review toevoegen = regel toevoegen en opnieuw bouwen.
 
 ## QR-codes op voertuigen
 

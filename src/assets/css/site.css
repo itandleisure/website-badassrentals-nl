@@ -243,9 +243,7 @@ fieldset.field{border:0;padding:0;margin:0}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 
-/* live Google-reviews */
-.reviews-summary{font-size:1.05rem;margin:-18px 0 26px;color:#e8e3da}
-.reviews-summary strong{color:var(--accent);font-size:1.3rem;margin-right:4px}
-.reviews-summary .link-arrow{color:#fff}
-.review figcaption a{color:var(--accent);text-decoration:none}
+/* reviews */
 .review-meta{display:block;font-weight:400;font-size:.85rem;color:#9d978c;margin-top:2px}
+.reviews-more{margin:26px 0 0}
+.section-dark .link-arrow{color:#fff}

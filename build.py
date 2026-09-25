@@ -151,25 +151,30 @@ def render_shortcodes(body, page):
 
 
 # --------------------------------------------------------------------------- herbruikbare blokken
+# 5-sterren Google-reviews (overgenomen van de oude site / Google Maps). Letterlijke tekst, alleen spaties opgeschoond.
+GOOGLE_REVIEWS_URL = "https://www.google.com/maps/search/?api=1&query=Badass+Rentals+Giethoorn"
 REVIEWS = [
-    ("Anthonie", "Prachtige route in de Weerribben gereden met de E-choppers van Badass Rentals. Vriendelijk geholpen, geen druk om op tijd terug te zijn en een oplaadsnoer voor mijn telefoon op de E-chopper. Ik zou er zeker terugkomen!"),
-    ("Nancy", "Een E-chopper gehuurd in Giethoorn en de Badass-toer gevolgd. Ontzettend leuk om te cruisen en door een prachtig dorpje (Belt-Schutsloot) gereden dat een onuitwisbare indruk heeft gemaakt. Was hartstikke leuk!"),
-    ("E.J. Ilgun", "Iedereen uit onze groep kon een aantal voertuigen proberen en zo de beste keuze maken. Geen gedoe en daarna een mooie route van ruim een uur door en om Giethoorn. De fatbike is een aanrader!"),
-    ("Sophie Markus", "Mega mega vriendelijke service, ze zetten absoluut de extra stap. Zeker een aanrader en super bedankt!"),
-    ("Arjen Paul", "Heerlijk zondagmiddag getoerd, goed weer en goed materiaal! Op een elektrische, stille chopper de natuur verkennen is echt een aanrader. Top geregeld."),
-    ("Marielle", "Erg leuke dag gehad met de collega's!! Aanrader!!!"),
+    ("Anthonie", "Prachtige route in de Weerribben gereden met de E-choppers van Badass Rentals. Vriendelijk geholpen, geen druk om op tijd terug te zijn o.i.d., oplaadsnoer voor mijn telefoon gratis kunnen gebruiken op de E-chopper. Ik beveel dit bedrijf aan en zou er zeker terugkomen!"),
+    ("Nancy Ook", "Een E-chopper gehuurd in Giethoorn en de Badass toer gevolgd op route.nl. Ontzettend leuk om te cruisen en door een prachtig dorpje gesjeest (Belt-Schutsloot) dat op mij een onuitwisbare indruk heeft gemaakt! Een E-chopper huren ga ik zeker nog eens doen. Was hartstikke leuk!!"),
+    ("E. J. Ilgun", "Iedereen uit onze groep kon een aantal voertuigen proberen en zo de beste keuze maken. Geen gedoe en daarna een mooie route van ruim een uur door en om Giethoorn gereden op choppers, scooters en fat bike. Deze laatste is een aanrader!"),
+    ("Arjen Paul", "Heerlijk zondagmiddag getoerd, goed weer en goed materiaal! Ik woon al heel wat jaar in de buurt, maar op een elektrische stille chopper de natuur verkennen is echt een aanrader. En na afloop heerlijk eten in Blokzijl! Top geregeld."),
+    ("Sophie Markus", "Mega mega vriendelijke service, zetten absoluut de extra stap in service. Zeker een aanrader en super bedankt!"),
+    ("Rianne Niemeijer", "Top! Vriendelijke mensen en echt genoten van onze tour!"),
+    ("Marjolein Knoll-Veld", "Super leuke rit gemaakt. Vriendelijk en zeer behulpzaam personeel."),
+    ("Henk Hetebrij", "Erg leuke ervaring, goed geregeld."),
+    ("Rianne de Vries", "Hele leuke ervaring om te doen, vriendelijk personeel! Aanrader!"),
 ]
 
 
 def reviews_html():
     cards = "".join(
         f'<figure class="review"><div class="stars" aria-label="5 sterren">★★★★★</div>'
-        f"<blockquote>{html.escape(t)}</blockquote><figcaption>{html.escape(n)}</figcaption></figure>"
+        f"<blockquote>{html.escape(t)}</blockquote><figcaption>{html.escape(n)}"
+        f'<span class="review-meta">Review op Google</span></figcaption></figure>'
         for n, t in REVIEWS
     )
-    # Statische reviews zijn de fallback; site.js vervangt ze door live Google-reviews via /reviews.php
-    return (f'<div class="reviews-wrap" data-google-reviews><p class="reviews-summary" hidden></p>'
-            f'<div class="reviews">{cards}</div></div>')
+    return (f'<div class="reviews">{cards}</div>'
+            f'<p class="reviews-more"><a class="link-arrow" href="{GOOGLE_REVIEWS_URL}" rel="noopener">Bekijk alle reviews op Google</a></p>')
 
 
 def usps_html():

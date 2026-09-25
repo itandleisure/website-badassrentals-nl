@@ -57,7 +57,9 @@ function send_mail(string $subject, string $body, string $replyTo = '', string $
         'X-Mailer: badassrentals.nl',
     ];
     if ($replyTo !== '') {
-        $name = $replyName !== '' ? mb_encode_mimeheader(one_line($replyName), 'UTF-8') . ' ' : '';
+        // Alleen letters, cijfers, spaties en . ' - in de weergavenaam (geen : , ; @ < > of aanhalingstekens)
+        $clean = trim(preg_replace("/[^\\p{L}\\p{N} .'\\-]/u", '', one_line($replyName)));
+        $name = $clean !== '' ? '"' . mb_encode_mimeheader($clean, 'UTF-8') . '" ' : '';
         $headers[] = 'Reply-To: ' . $name . '<' . $replyTo . '>';
     }
     return mail(
