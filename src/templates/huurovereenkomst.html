@@ -1,0 +1,76 @@
+<section class="plain-head">
+  <div class="wrap prose">
+    <span class="eyebrow">Huurovereenkomst</span>
+    <h1>Verhuur {{kind}}</h1>
+    <p>Welkom bij Badass Rentals! Vul hieronder je gegevens in en ga akkoord met de voorwaarden. Daarna ben je klaar om te gaan rijden.</p>
+  </div>
+</section>
+<section class="section" style="padding-top:20px">
+  <div class="wrap prose">
+    <form class="form js-form" id="formulier" action="/verzenden.php" method="post">
+      <input type="hidden" name="form" value="huurovereenkomst">
+      <input type="hidden" name="page" value="">
+      <input type="hidden" name="ts" value="">
+      <input type="hidden" name="versie" value="{{kind}} voorwaarden website 2026">
+      <div class="hp" aria-hidden="true"><label>Laat dit veld leeg <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
+      <div class="form-grid">
+        <div class="field full">
+          <label for="voertuig">Voertuig</label>
+          <input id="voertuig" name="voertuig" value="{{vehicle}}" readonly>
+        </div>
+        <div class="field full">
+          <label for="naam">Je naam</label>
+          <input id="naam" name="naam" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="email">E-mailadres</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="telefoon">Telefoonnummer</label>
+          <input id="telefoon" name="telefoon" type="tel" autocomplete="tel" required>
+        </div>
+        <div class="field full">
+          <label for="start">Start datum &amp; tijd verhuur</label>
+          <input id="start" name="start" type="datetime-local" data-now required>
+        </div>
+      </div>
+
+      <h2 style="font-size:1.6rem;margin-top:28px">Algemene voorwaarden</h2>
+      <div class="terms-box">
+        <h3>De verhuurder</h3>
+        <ul>
+          <li>stelt de {{kind_lower}} beschikbaar voor de overeengekomen tijdsduur, in goed onderhouden staat met een volgeladen accu;</li>
+          {% if echopper %}<li>de e-chopper is WA-verzekerd met een eigen risico van € 1.000,00 voor de huurder;</li>{% endif %}
+          {% if fatbike %}<li>de fatbike is verzekerd met een eigen risico van € 1.000,00 voor de huurder;</li>{% endif %}
+          <li>is niet aansprakelijk voor welke schade dan ook die door de huurder is veroorzaakt gedurende de duur van deze overeenkomst.</li>
+        </ul>
+        <h3>De huurder</h3>
+        <ul>
+          {% if echopper %}<li>beschikt over een geldig rijbewijs;</li>{% endif %}
+          {% if fatbike %}<li>is minimaal 1 meter 50 (150 cm) lang;</li>{% endif %}
+          <li>is verplicht zich aan de wettelijke verkeersregels te houden;</li>
+          <li>de maximaal toegestane snelheid is 25 kilometer per uur;</li>
+          <li>onderverhuur of uitlenen is niet toegestaan; de huurder is aansprakelijk voor alle gevolgen;</li>
+          <li>het is de huurder niet toegestaan om met de {{kind_lower}} het centrum van Steenwijk te betreden. In dit gebied geldt cameratoezicht en bij constatering volgt automatisch een boete van € 210. Deze boete wordt volledig op de huurder verhaald;</li>
+          <li>de huurder is aansprakelijk voor aan de {{kind_lower}} toegebrachte schade of voor diefstal tijdens de duur van deze overeenkomst;</li>
+          <li>een {{kind_lower}} is bedoeld voor één persoon. Om veiligheidsredenen en in verband met de verzekering mogen er geen kinderen of andere passagiers meerijden.</li>
+        </ul>
+        <h3>Wat kost het bij schade? Veelvoorkomende gevallen</h3>
+        <ul>
+          <li>Gashendel &amp; contactslot: € 40</li>
+          <li>Knipperlichtlampjes: € 15</li>
+          <li>Voetsteppje achterop (links of rechts): € 25</li>
+        </ul>
+        <p>Verder gelden de <a href="/algemene-voorwaarden/" target="_blank">algemene voorwaarden van Badass Rentals</a>.</p>
+      </div>
+
+      <div class="field" style="margin-top:18px">
+        <label class="choice"><input type="checkbox" name="akkoord" value="ja" required> Ik heb de algemene voorwaarden gelezen en ga hiermee akkoord</label>
+      </div>
+      <p style="margin-top:20px"><button class="btn btn-accent" type="submit">Versturen &amp; gaan rijden</button></p>
+      <p class="form-note">Pech of vragen onderweg? Bel <a href="tel:{{biz.phone}}">{{biz.phone_display}}</a>. Je gegevens gebruiken we alleen voor deze huurovereenkomst, zie onze <a href="/privacyverklaring/">privacyverklaring</a>.</p>
+    </form>
+  </div>
+</section>

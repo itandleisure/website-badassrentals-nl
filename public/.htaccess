@@ -1,0 +1,83 @@
+# Badass Rentals - Apache configuratie
+Options -Indexes
+DirectoryIndex index.html index.php
+ErrorDocument 404 /404.html
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# HTTPS en zonder www
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://badassrentals.nl/$1 [R=301,L]
+
+# Trailing slash toevoegen aan mappen
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !\.[a-z0-9]{2,5}$ [NC]
+RewriteCond %{REQUEST_URI} !/$
+RewriteRule ^(.*)$ /$1/ [R=301,L]
+
+# ---- Oude WordPress-URL's -> nieuwe pagina's (301) ----
+# Homepage-varianten en verdwenen landingspagina's
+RewriteRule ^(echopper-verhuur-giethoorn|badassrentals-homepagina|begin-je-badass-ride-in-giethoorn|begin-je-badass-ride-in-blokzijl|begin-je-badass-ride-in-emmeloord|echopper-rental-cast-horn|bakfiets-huren-in-giethoorn-3|media|badass-chopper-game|leaderboard)/?$ / [R=301,L,NC]
+# E-chopper-varianten
+RewriteRule ^(e-bike-huren-giethoorn|electrische-scooter-giethoorn|e-chopper-huren-overijssel|e-chopper-weerribben|e-chopper-drenthe|e-chopper-huren-in-blokzijl|prijzen)/?$ /e-chopper-huren-giethoorn/ [R=301,L,NC]
+# Teamuitjes
+RewriteRule ^(bedrijfsuitje-meppel|organiseer-een-teamuitje-met-elektrische-scooters)/?$ /teamuitje-met-echopper/ [R=301,L,NC]
+# Arrangementen
+RewriteRule ^(e-chopper-arrangement-weeribben-wieden|ons-badass-vaderdag-arrangement|geef-papa-het-stoerste-vaderdag-cadeau)/?$ /arrangementen/ [R=301,L,NC]
+# Vrijgezellen / vriendinnen
+RewriteRule ^(met-je-vriendinnen-op-stap-met-de-scooter)/?$ /vrijgezellenfeest-met-elektrische-scooters/ [R=301,L,NC]
+# Engelse pagina's en overige
+RewriteRule ^frequently-asked-questions/?$ /veelgestelde-vragen/ [R=301,L,NC]
+RewriteRule ^terms-and-conditions/?$ /algemene-voorwaarden/ [R=301,L,NC]
+RewriteRule ^get-in-touch/?$ /kom-in-contact/ [R=301,L,NC]
+RewriteRule ^(samenwerkende-partijen|alle-voordelen-op-een-rij)/?$ /samenwerking/ [R=301,L,NC]
+# VR, escape en wandelingen (niet meer op deze site)
+RewriteRule ^(red-flu-escape-koffer|interactieve-wandeling-door-meppel|interactieve-wandeling-meppel|interactieve-wandeling-door-steenwijk|interactieve-wandeling-steenwijk|la-casa-de-dinero-vr-escape-experience|virtual-reality-escape-games)/?$ / [R=301,L,NC]
+# Oude blogberichten
+RewriteRule ^(nostalgisch-solex-rijden-of-badass-op-een-e-chopper|lekker-uitwaaien-op-een-stoer-elektrisch-scootertje|ga-lekker-cruisen-door-oldemarkt|het-beste-corona-proof-uitje-in-de-regio|geef-een-badass-cadeaubon|combineer-een-avondje-bios-met-een-tocht-op-onze-scooters|verken-de-omgeving-van-kalenberg|stap-op-de-scooter-in-steenwijk|ben-jij-een-badass-voetbalkoning|maak-de-blitz-op-de-donderdag-meppel-dagen|lekker-toeren-in-en-om-havelte-met-onze-elektrische-scooters)/?$ /nieuws/ [R=301,L,NC]
+RewriteRule ^(feed|comments/feed|category/.*|author/.*)/?$ /nieuws/ [R=301,L,NC]
+# Voorwaarden-PDF's
+RewriteRule ^wp-content/uploads/badass-rentals-algemene-voorwaarden-v1\.2-NL\.pdf$ /assets/docs/badass-rentals-algemene-voorwaarden-v1.2-NL.pdf [R=301,L,NC]
+RewriteRule ^wp-content/uploads/badass-rentals-beneral-terms-v1\.1-English\.pdf$ /assets/docs/badass-rentals-general-terms-v1.1-EN.pdf [R=301,L,NC]
+# WordPress-restanten blokkeren
+RewriteRule ^(wp-login\.php|xmlrpc\.php|wp-admin/.*)$ - [G,L,NC]
+</IfModule>
+
+# Beveiliging
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>
+<FilesMatch "\.(csv|py|md|log)$">
+  Require all denied
+</FilesMatch>
+
+# Compressie
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript application/json image/svg+xml application/xml text/xml application/manifest+json
+</IfModule>
+
+# Caching
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 hour"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/pdf "access plus 1 month"
+</IfModule>
+AddType font/woff2 .woff2
+AddType image/webp .webp
+AddType application/manifest+json .webmanifest

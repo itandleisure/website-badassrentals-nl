@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.claude/
+# oude, niet meer gebruikte map
+src/assets/img/
+.DS_Store
+Thumbs.db

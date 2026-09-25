@@ -1,0 +1,58 @@
+---
+title: Samenwerken: e-choppers voor je gasten | Badass Rentals
+description: Camping, hotel, B&B of vakantiepark? Bied je gasten e-choppers en fatbikes aan, zonder verzekerings- of onderhoudskosten. Ontdek de voordelen.
+image: e-chopper-bij-bruggetje-giethoorn
+crumb: Samenwerken
+priority: 0.6
+---
+<section class="hero hero-sm">
+  {% img e-chopper-bij-bruggetje-giethoorn "Rode e-chopper bij een houten bruggetje in Giethoorn" eager %}
+  <div class="wrap">
+    <span class="eyebrow">Voor bedrijven</span>
+    <h1>Samenwerken met Badass Rentals</h1>
+    <p class="lead">Laat jouw gasten of medewerkers genieten van onze e-choppers en fatbikes, zonder zelf te investeren.</p>
+    <div class="btn-row"><a class="btn btn-accent" href="#formulier">Neem contact op</a></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Voor wie?</h2>
+      <p>Badass Rentals is ontstaan om mensen een unieke ervaring in de regio te bieden. Om onze tweewielers zo veel mogelijk te laten rijden, werken we graag samen met campings, bed &amp; breakfasts, restaurants, hotels, vakantieparken en bedrijven.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="card-body"><h3>Geen verzekerings- en onderhoudskosten</h3><p>De e-choppers en fatbikes zijn van ons. Jij hebt geen omkijken naar verzekering, onderhoud of reparaties.</p></div></div>
+      <div class="card"><div class="card-body"><h3>Eenvoudig boekingssysteem</h3><p>Nooit meer "nee" verkopen: is alles verhuurd, dan is er simpelweg niets meer boekbaar. Zo weten jij en je gasten altijd waar ze aan toe zijn.</p></div></div>
+      <div class="card"><div class="card-body"><h3>Op jouw locatie</h3><p>Wij brengen en halen de tweewielers op jouw locatie. Een zorgeloze ervaring voor jou én je gasten.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="formulier">
+  <div class="wrap split" style="align-items:start">
+    <div class="prose">
+      <h2>Ga de samenwerking aan</h2>
+      <p>Vertel ons iets over je bedrijf. We nemen snel contact met je op om de mogelijkheden te bespreken.</p>
+      <p>Of bel direct: <a href="tel:{{biz.phone}}">{{biz.phone_display}}</a>.</p>
+    </div>
+    <form class="form js-form" action="/verzenden.php" method="post">
+      <input type="hidden" name="form" value="samenwerking">
+      <input type="hidden" name="page" value="">
+      <input type="hidden" name="ts" value="">
+      <div class="hp" aria-hidden="true"><label>Laat dit veld leeg <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="form-grid">
+        <div class="field"><label for="s-naam">Naam</label><input id="s-naam" name="naam" autocomplete="name" required></div>
+        <div class="field"><label for="s-bedrijf">Bedrijfsnaam</label><input id="s-bedrijf" name="bedrijf" autocomplete="organization"></div>
+        <div class="field"><label for="s-type">Type bedrijf</label>
+          <select id="s-type" name="type_bedrijf"><option value="">Maak een keuze</option><option>Camping</option><option>Bed &amp; breakfast</option><option>Hotel</option><option>Restaurant</option><option>Vakantiepark</option><option>Ander bedrijf</option></select></div>
+        <div class="field"><label for="s-site">Website <span class="opt">(optioneel)</span></label><input id="s-site" name="site" type="url" placeholder="https://"></div>
+        <div class="field"><label for="s-email">E-mailadres</label><input id="s-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="s-tel">Telefoonnummer <span class="opt">(optioneel)</span></label><input id="s-tel" name="telefoon" type="tel" autocomplete="tel"></div>
+        <div class="field full"><label for="s-bericht">Hoe kunnen we je helpen? <span class="opt">(optioneel)</span></label><textarea id="s-bericht" name="bericht"></textarea></div>
+      </div>
+      <p style="margin-top:18px"><button class="btn btn-accent" type="submit">Versturen</button></p>
+      <p class="form-note">Zie onze <a href="/privacyverklaring/">privacyverklaring</a>.</p>
+    </form>
+  </div>
+</section>
