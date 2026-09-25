@@ -24,11 +24,9 @@ RewriteRule ^(echopper-verhuur-giethoorn|badassrentals-homepagina|begin-je-badas
 # E-chopper-varianten
 RewriteRule ^(e-bike-huren-giethoorn|electrische-scooter-giethoorn|e-chopper-huren-overijssel|e-chopper-weerribben|e-chopper-drenthe|e-chopper-huren-in-blokzijl|prijzen)/?$ /e-chopper-huren-giethoorn/ [R=301,L,NC]
 # Teamuitjes
-RewriteRule ^(bedrijfsuitje-meppel|organiseer-een-teamuitje-met-elektrische-scooters)/?$ /teamuitje-met-echopper/ [R=301,L,NC]
+RewriteRule ^(bedrijfsuitje-meppel)/?$ /teamuitje-met-echopper/ [R=301,L,NC]
 # Arrangementen
-RewriteRule ^(e-chopper-arrangement-weeribben-wieden|ons-badass-vaderdag-arrangement|geef-papa-het-stoerste-vaderdag-cadeau)/?$ /arrangementen/ [R=301,L,NC]
-# Vrijgezellen / vriendinnen
-RewriteRule ^(met-je-vriendinnen-op-stap-met-de-scooter)/?$ /vrijgezellenfeest-met-elektrische-scooters/ [R=301,L,NC]
+RewriteRule ^(e-chopper-arrangement-weeribben-wieden|ons-badass-vaderdag-arrangement)/?$ /arrangementen/ [R=301,L,NC]
 # Engelse pagina's en overige
 RewriteRule ^frequently-asked-questions/?$ /veelgestelde-vragen/ [R=301,L,NC]
 RewriteRule ^terms-and-conditions/?$ /algemene-voorwaarden/ [R=301,L,NC]
@@ -38,8 +36,8 @@ RewriteRule ^(samenwerkende-partijen|alle-voordelen-op-een-rij)/?$ /samenwerking
 RewriteRule ^(red-flu-escape-koffer|la-casa-de-dinero-vr-escape-experience|virtual-reality-escape-games)/?$ /arrangementen/ [R=301,L,NC]
 # Interactieve wandelingen (niet meer op deze site)
 RewriteRule ^(interactieve-wandeling-door-meppel|interactieve-wandeling-meppel|interactieve-wandeling-door-steenwijk|interactieve-wandeling-steenwijk)/?$ / [R=301,L,NC]
-# Oude blogberichten
-RewriteRule ^(nostalgisch-solex-rijden-of-badass-op-een-e-chopper|lekker-uitwaaien-op-een-stoer-elektrisch-scootertje|ga-lekker-cruisen-door-oldemarkt|het-beste-corona-proof-uitje-in-de-regio|geef-een-badass-cadeaubon|combineer-een-avondje-bios-met-een-tocht-op-onze-scooters|verken-de-omgeving-van-kalenberg|stap-op-de-scooter-in-steenwijk|ben-jij-een-badass-voetbalkoning|maak-de-blitz-op-de-donderdag-meppel-dagen|lekker-toeren-in-en-om-havelte-met-onze-elektrische-scooters)/?$ /nieuws/ [R=301,L,NC]
+# Oude blogberichten die niet meer actueel zijn
+RewriteRule ^(het-beste-corona-proof-uitje-in-de-regio)/?$ /nieuws/ [R=301,L,NC]
 RewriteRule ^(feed|comments/feed|category/.*|author/.*)/?$ /nieuws/ [R=301,L,NC]
 # Voorwaarden-PDF's
 RewriteRule ^wp-content/uploads/badass-rentals-algemene-voorwaarden-v1\.2-NL\.pdf$ /assets/docs/badass-rentals-algemene-voorwaarden-v1.2-NL.pdf [R=301,L,NC]
