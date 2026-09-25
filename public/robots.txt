@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /verzenden.php
+Disallow: /reviews.php
 Disallow: /private/
 
 Sitemap: https://badassrentals.nl/sitemap.xml

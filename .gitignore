@@ -5,3 +5,8 @@ __pycache__/
 src/assets/img/
 .DS_Store
 Thumbs.db
+
+# Server-only: API-sleutel en caches
+**/private/config.php
+**/private/*.json
+**/private/*.csv
