@@ -42,59 +42,6 @@
     });
   });
 
-  // Live Google-reviews (via /reviews.php). Lukt dat niet, dan blijven de vaste reviews staan.
-  var blocks = document.querySelectorAll('[data-google-reviews]');
-  if (blocks.length && window.fetch) {
-    fetch('/reviews.php', { headers: { Accept: 'application/json' } })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (data) {
-        if (!data || !data.reviews || data.reviews.length < 3) return;
-        blocks.forEach(function (block) { renderReviews(block, data); });
-      })
-      .catch(function () {});
-  }
-
-  function el(tag, cls, text) {
-    var e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (text) e.textContent = text;
-    return e;
-  }
-
-  function renderReviews(block, data) {
-    var list = block.querySelector('.reviews');
-    var summary = block.querySelector('.reviews-summary');
-    if (data.rating && data.count) {
-      summary.textContent = '';
-      summary.appendChild(el('strong', '', String(data.rating).replace('.', ',') + ' ★'));
-      summary.appendChild(document.createTextNode(' op Google, gebaseerd op ' + data.count + ' reviews. '));
-      if (data.url) {
-        var a = el('a', 'link-arrow', 'Bekijk alle reviews');
-        a.href = data.url; a.rel = 'noopener';
-        summary.appendChild(a);
-      }
-      summary.hidden = false;
-    }
-    list.textContent = '';
-    data.reviews.forEach(function (r) {
-      var fig = el('figure', 'review');
-      var stars = el('div', 'stars', '★★★★★'.slice(0, r.rating));
-      stars.setAttribute('aria-label', r.rating + ' sterren');
-      fig.appendChild(stars);
-      fig.appendChild(el('blockquote', '', r.text));
-      var cap = el('figcaption');
-      if (r.author_url) {
-        var link = el('a', '', r.author); link.href = r.author_url; link.rel = 'noopener nofollow';
-        cap.appendChild(link);
-      } else {
-        cap.textContent = r.author;
-      }
-      cap.appendChild(el('span', 'review-meta', (r.when ? r.when + ' · ' : '') + 'Google'));
-      fig.appendChild(cap);
-      list.appendChild(fig);
-    });
-  }
-
   // Datum/tijd standaard op nu (huurovereenkomst)
   var dt = document.querySelector('input[type="datetime-local"][data-now]');
   if (dt && !dt.value) {
