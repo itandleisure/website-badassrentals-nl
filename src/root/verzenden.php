@@ -173,6 +173,7 @@ switch ($type) {
         $vehicle = one_line(field('voertuig', 120));
         $start   = one_line(field('start', 40));
         $akkoord = field('akkoord', 10) === 'ja';
+        $afkoop  = field('afkoop', 10) === 'ja';
         if ($vehicle === '') {
             $errors[] = 'voertuig';
         }
@@ -189,6 +190,7 @@ switch ($type) {
             'Telefoon'                  => $phone,
             'Start verhuur'             => $start,
             'Akkoord voorwaarden'       => $akkoord ? 'Ja' : 'Nee',
+            'Afkoopregeling afgenomen'  => $afkoop ? 'Ja' : 'Nee',
             'Versie voorwaarden'        => one_line(field('versie', 40)),
             'Verstuurd op'              => date('d-m-Y H:i:s'),
             'IP-adres'                  => $_SERVER['REMOTE_ADDR'] ?? '',
