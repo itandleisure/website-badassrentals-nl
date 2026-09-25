@@ -1,0 +1,69 @@
+# Zet de website (map public/) automatisch op de Vimexx-hosting bij elke push naar main.
+#
+# Eenmalig instellen in GitHub: Settings > Secrets and variables > Actions > New repository secret
+#   FTP_SERVER    FTP-server van Vimexx (staat in de welkomstmail / DirectAdmin)
+#   FTP_USERNAME  FTP-gebruikersnaam
+#   FTP_PASSWORD  FTP-wachtwoord
+#   FTP_DIR       map op de server, meestal /domains/badassrentals.nl/public_html
+#
+# Standaard wordt alles uit public/ geüpload en overschreven; er wordt niets verwijderd.
+# Handmatig starten met "opruimen" (Actions > Deploy > Run workflow) verwijdert ook bestanden op de
+# server die niet meer in public/ staan. Getekende huurovereenkomsten en caches blijven altijd staan.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ["public/**"]
+  workflow_dispatch:
+    inputs:
+      opruimen:
+        description: "Ook bestanden op de server verwijderen die niet meer in public/ staan"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Controleren of de build compleet is
+        run: |
+          test -f public/index.html
+          test -f public/.htaccess
+          test -f public/verzenden.php
+          test -f public/algemene-voorwaarden/verhuur-e-chopper-nummer-1-met-kenteken-fgb-58-s/index.html
+
+      - name: lftp installeren
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Uploaden via FTPS
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+          OPRUIMEN: ${{ github.event.inputs.opruimen == 'true' }}
+        run: |
+          set -euo pipefail
+          for v in FTP_SERVER FTP_USERNAME FTP_PASSWORD FTP_DIR; do
+            [ -n "${!v}" ] || { echo "Secret $v ontbreekt"; exit 1; }
+          done
+          DELETE=""
+          if [ "$OPRUIMEN" = "true" ]; then DELETE="--delete"; echo "Opruimen staat aan"; fi
+          export LFTP_PASSWORD="$FTP_PASSWORD"  # wachtwoord via omgeving, niet als argument
+          lftp -u "$FTP_USERNAME" --env-password "$FTP_SERVER" <<EOF
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set net:max-retries 3
+          set net:timeout 30
+          mirror --reverse --parallel=4 --verbose $DELETE --exclude-glob private/*.csv --exclude-glob private/*.json --exclude .well-known/ --exclude cgi-bin/ public/ "$FTP_DIR"
+          bye
+          EOF
