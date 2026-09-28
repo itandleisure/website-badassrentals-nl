@@ -47,6 +47,11 @@ BUSINESS = {
     "maps": "https://www.google.com/maps/search/?api=1&query=Hollands+Veneti%C3%AB+Beulakerweg+167+Giethoorn",
 }
 
+# Web-app-URL van het Google Apps Script (tools/google-formulier/Code.gs), eindigt op /exec.
+# Gevuld: formulieren gaan naar Google Sheets + e-mail, met verzenden.php als reserveroute.
+# Leeg: formulieren gaan alleen via verzenden.php.
+GOOGLE_FORM_URL = ""
+
 # Links naar het boekingssysteem. Deze URL's niet wijzigen zonder de boekingsomgeving te controleren.
 BOOK = {
     "root": "https://verhuur.badassrentals.nl/",
@@ -351,7 +356,7 @@ def layout(page, body, path):
 <link rel="stylesheet" href="/assets/css/site.css?v={VERSION}">
 {schema_html}
 </head>
-<body class="{body_class}">
+<body class="{body_class}"{f' data-google-form="{GOOGLE_FORM_URL}"' if GOOGLE_FORM_URL else ""}>
 <a class="skip" href="#main">Direct naar de inhoud</a>
 <div class="topbar"><div class="wrap topbar-inner">
   <span>Start bij {BUSINESS['location']}, {BUSINESS['street']} in {BUSINESS['city']}</span>

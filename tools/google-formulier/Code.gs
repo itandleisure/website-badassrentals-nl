@@ -1,0 +1,186 @@
+/* Formulieren Badass Rentals → Google Sheet + e-mail
+   ---------------------------------------------------------------
+   Dit script hoort bij een Google Sheet (Extensies → Apps Script).
+   - Elk formulier van badassrentals.nl komt als nieuwe regel in een eigen tabblad:
+     Contact, Teamuitjes, Samenwerking en Huurovereenkomsten.
+   - Er gaat meteen een e-mail naar ONTVANGER (antwoorden gaat rechtstreeks naar de invuller).
+   - Regels ouder dan de bewaartermijn per tabblad worden elke nacht automatisch verwijderd (privacy).
+
+   Eenmalig: kies bovenin de functie "installeer" en klik op Uitvoeren (geeft toestemming
+   en zet de nachtelijke opruimtaak aan). Daarna: Implementeren → Nieuwe implementatie → Web-app,
+   "Uitvoeren als: ik", "Toegang: iedereen". Zet de /exec-URL in GOOGLE_FORM_URL in build.py.
+
+   Script gewijzigd? Implementeren → Implementaties beheren → bewerken → Nieuwe versie
+   (dan blijft de URL gelijk). */
+
+var ONTVANGER = 'info@badassrentals.nl';
+var AFZENDER_NAAM = 'Website Badass Rentals';
+
+// Per formuliertype: tabblad, kolommen, bewaartermijn en onderwerp van de mail
+var FORMULIEREN = {
+  contact: {
+    tabblad: 'Contact', bewaarMaanden: 12, onderwerp: 'Contactformulier',
+    velden: [['naam', 'Naam'], ['email', 'E-mail'], ['telefoon', 'Telefoon'], ['onderwerp', 'Vraag over'], ['bericht', 'Bericht']]
+  },
+  teamuitje: {
+    tabblad: 'Teamuitjes', bewaarMaanden: 12, onderwerp: 'Aanvraag teamuitje',
+    velden: [['naam', 'Naam'], ['bedrijf', 'Bedrijf / groep'], ['email', 'E-mail'], ['telefoon', 'Telefoon'],
+      ['personen', 'Aantal personen'], ['datum', 'Gewenste datum'], ['interesse', 'Interesse'], ['bericht', 'Bericht']]
+  },
+  samenwerking: {
+    tabblad: 'Samenwerking', bewaarMaanden: 12, onderwerp: 'Aanvraag samenwerking',
+    velden: [['naam', 'Naam'], ['bedrijf', 'Bedrijf'], ['type_bedrijf', 'Type bedrijf'], ['site', 'Website'],
+      ['email', 'E-mail'], ['telefoon', 'Telefoon'], ['bericht', 'Bericht']]
+  },
+  huurovereenkomst: {
+    // Langer bewaren: nodig bij schade, boetes of diefstal die later bekend worden
+    tabblad: 'Huurovereenkomsten', bewaarMaanden: 24, onderwerp: 'Huurovereenkomst getekend',
+    velden: [['voertuig', 'Voertuig'], ['naam', 'Naam huurder'], ['email', 'E-mail'], ['telefoon', 'Telefoon'],
+      ['start', 'Start verhuur'], ['akkoord', 'Akkoord voorwaarden'], ['afkoop', 'Afkoopregeling afgenomen'],
+      ['versie', 'Versie voorwaarden']]
+  }
+};
+
+// Ontvangt een formulier van de website
+function doPost(e) {
+  var p = (e && e.parameter) || {};
+  var lijsten = (e && e.parameters) || {};   // meerdere waarden, bijv. aangevinkte keuzes
+
+  // Verborgen veld ingevuld of binnen 3 seconden verstuurd = spambot: doen alsof het gelukt is
+  var ts = parseInt(p.ts, 10);
+  if (p.website || (ts && Date.now() / 1000 - ts < 3)) return antwoord({ ok: true });
+
+  var type = schoon(p.form, 40);
+  var cfg = FORMULIEREN[type];
+  if (!cfg) return antwoord({ ok: false, fout: 'onbekend formulier' });
+
+  var g = {};
+  cfg.velden.forEach(function (v) {
+    var sleutel = v[0];
+    var waarden = lijsten[sleutel] || lijsten[sleutel + '[]'];
+    g[sleutel] = waarden && waarden.length > 1 ? schoon(waarden.join(', '), 1000) : schoon(p[sleutel] || p[sleutel + '[]'], 5000);
+  });
+  g.pagina = schoon(p.page || p.pagina, 300);
+
+  // Controles (gelijk aan verzenden.php)
+  var fouten = [];
+  if (!g.naam) fouten.push('naam');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.email)) fouten.push('email');
+  if (type === 'contact' && !g.bericht) fouten.push('bericht');
+  if (type === 'huurovereenkomst') {
+    if (!g.voertuig) fouten.push('voertuig');
+    if (!g.telefoon) fouten.push('telefoon');
+    if (g.akkoord !== 'ja') fouten.push('akkoord');
+    g.akkoord = g.akkoord === 'ja' ? 'Ja' : 'Nee';
+    g.afkoop = g.afkoop === 'ja' ? 'Ja' : 'Nee';
+  }
+  if (fouten.length) return antwoord({ ok: false, fout: 'velden', velden: fouten });
+
+  // 1. Opslaan in de spreadsheet (slot voorkomt dat twee inzendingen tegelijk botsen)
+  var slot = LockService.getScriptLock();
+  slot.waitLock(10000);
+  try {
+    blad(cfg).appendRow([new Date(), g.pagina].concat(cfg.velden.map(function (v) {
+      return veiligVoorSheet(g[v[0]]);
+    })));
+  } finally {
+    slot.releaseLock();
+  }
+
+  // 2. E-mail sturen. Lukt dat niet, dan staat de inzending in ieder geval al in de spreadsheet.
+  try {
+    var extra = type === 'huurovereenkomst' ? ': ' + g.voertuig + ' - ' + g.naam
+      : type === 'teamuitje' && g.personen ? ': ' + g.naam + ' (' + g.personen + ' pers.)'
+      : ': ' + (g.bedrijf || g.naam);
+    stuurMail(cfg, g, cfg.onderwerp + extra);
+  } catch (fout) {
+    console.error('Mail versturen mislukt: ' + fout);
+  }
+
+  return antwoord({ ok: true });
+}
+
+// Openen van de web-app-link in de browser: laat zien dat het script werkt
+function doGet() {
+  return ContentService.createTextOutput('Formulier-ontvanger Badass Rentals is actief.');
+}
+
+// Eenmalig uitvoeren: maakt de tabbladen aan en zet de nachtelijke opruimtaak aan
+function installeer() {
+  Object.keys(FORMULIEREN).forEach(function (k) { blad(FORMULIEREN[k]); });
+  var bestaat = ScriptApp.getProjectTriggers().some(function (t) {
+    return t.getHandlerFunction() === 'opruimen';
+  });
+  if (!bestaat) {
+    ScriptApp.newTrigger('opruimen').timeBased().everyDays(1).atHour(3).create();
+  }
+  opruimen();
+}
+
+// Verwijdert per tabblad de regels die ouder zijn dan de bewaartermijn
+function opruimen() {
+  Object.keys(FORMULIEREN).forEach(function (k) {
+    var cfg = FORMULIEREN[k];
+    var sheet = blad(cfg);
+    var laatste = sheet.getLastRow();
+    if (laatste < 2) return;
+    var grens = new Date();
+    grens.setMonth(grens.getMonth() - cfg.bewaarMaanden);
+    var datums = sheet.getRange(2, 1, laatste - 1, 1).getValues();
+    // Van onder naar boven, zodat regelnummers niet verschuiven
+    for (var i = datums.length - 1; i >= 0; i--) {
+      var d = datums[i][0];
+      if (d instanceof Date && d < grens) sheet.deleteRow(i + 2);
+    }
+  });
+}
+
+function blad(cfg) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(cfg.tabblad);
+  if (!sheet) {
+    var kolommen = ['Datum', 'Pagina'].concat(cfg.velden.map(function (v) { return v[1]; }));
+    sheet = ss.insertSheet(cfg.tabblad);
+    sheet.appendRow(kolommen);
+    sheet.getRange(1, 1, 1, kolommen.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    sheet.getRange('A:A').setNumberFormat('dd-mm-yyyy hh:mm');
+  }
+  return sheet;
+}
+
+function stuurMail(cfg, g, onderwerp) {
+  var rijen = cfg.velden.map(function (v) { return [v[1], g[v[0]]]; }).concat([['Pagina', g.pagina]]);
+  var html = '<table cellpadding="6" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px">' +
+    rijen.filter(function (r) { return r[1]; }).map(function (r) {
+      return '<tr><th align="left" valign="top" style="background:#F1EDE5">' + r[0] + '</th><td>' +
+        html_(r[1]).replace(/\n/g, '<br>') + '</td></tr>';
+    }).join('') + '</table>' +
+    '<p style="font-family:Arial,sans-serif;font-size:12px;color:#777">Deze inzending staat ook in de Google Sheet "' +
+    html_(SpreadsheetApp.getActiveSpreadsheet().getName()) + '", tabblad "' + cfg.tabblad + '".</p>';
+  MailApp.sendEmail({
+    to: ONTVANGER,
+    replyTo: g.email,
+    name: AFZENDER_NAAM,
+    subject: onderwerp,
+    htmlBody: html
+  });
+}
+
+function antwoord(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function schoon(waarde, max) {
+  return String(waarde || '').trim().slice(0, max);
+}
+
+// Voorkomt dat tekst die met = + - @ begint als formule wordt uitgevoerd, en dat Sheets
+// de voorloopnul van een telefoonnummer weghaalt (0612... wordt anders 612...)
+function veiligVoorSheet(tekst) {
+  return /^[=+\-@]/.test(tekst) || /^0\d/.test(tekst) ? "'" + tekst : tekst;
+}
+
+function html_(tekst) {
+  return String(tekst || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}

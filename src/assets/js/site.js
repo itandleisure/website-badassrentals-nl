@@ -39,6 +39,32 @@
       }
       var btn = form.querySelector('button[type="submit"]');
       if (btn) { btn.disabled = true; btn.textContent = 'Bezig met versturen…'; }
+
+      // Google Sheets + e-mail via Apps Script (URL op <body data-google-form>).
+      // Lukt dat niet, dan gaat het formulier gewoon naar verzenden.php (de action), zodat er niets verloren gaat.
+      var googleUrl = document.body.getAttribute('data-google-form');
+      if (!googleUrl || !window.fetch || !window.AbortController) return;
+      e.preventDefault();
+      var type = (form.querySelector('input[name="form"]') || {}).value;
+      var bedankt = type === 'huurovereenkomst' ? '/huurovereenkomst-ontvangen/' : '/bedankt/';
+      var stop = new AbortController();
+      var timer = setTimeout(function () { stop.abort(); }, 15000);
+      fetch(googleUrl, { method: 'POST', body: new URLSearchParams(new FormData(form)), signal: stop.signal })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          clearTimeout(timer);
+          if (res.ok) { location.href = bedankt; return; }
+          if (res.fout === 'velden') {
+            location.href = location.pathname + '?fout=velden#formulier';
+            if (location.search) location.reload();
+            return;
+          }
+          throw new Error(res.fout || 'mislukt');
+        })
+        .catch(function () {
+          clearTimeout(timer);
+          HTMLFormElement.prototype.submit.call(form);  // reserveroute: verzenden.php
+        });
     });
   });
 

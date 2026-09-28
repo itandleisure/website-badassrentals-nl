@@ -62,6 +62,22 @@ Het verschijnt vanzelf op /nieuws/ en in de sitemap.
 
 ## Formulieren
 
+**Google Sheets + e-mail (zoals bij coworkingcompeta.com).** Staat `GOOGLE_FORM_URL` in `build.py` ingevuld,
+dan stuurt `site.js` elk formulier naar het Google Apps Script `tools/google-formulier/Code.gs`.
+Dat zet de inzending in een eigen tabblad (Contact, Teamuitjes, Samenwerking, Huurovereenkomsten)
+en mailt info@badassrentals.nl. Opruimen gaat automatisch: 12 maanden, huurovereenkomsten 24 maanden.
+Lukt Google niet, dan gaat het formulier automatisch via `verzenden.php` (hieronder).
+
+Eenmalig instellen:
+1. Maak een Google Sheet, bijv. "Badass Rentals formulieren". Extensies > Apps Script: plak `Code.gs`.
+2. Kies de functie `installeer` en klik Uitvoeren (toestemming geven).
+3. Implementeren > Nieuwe implementatie > Web-app, uitvoeren als: ik, toegang: iedereen.
+4. Zet de /exec-URL in `GOOGLE_FORM_URL` in `build.py`, draai `python build.py`, commit en push.
+
+Script later gewijzigd? Implementeren > Implementaties beheren > bewerken > Nieuwe versie (URL blijft gelijk).
+
+**Reserveroute / zonder Google:**
+
 Alle formulieren posten naar `/verzenden.php` en worden gemaild naar **info@badassrentals.nl**
 (afzender `noreply@badassrentals.nl`, antwoorden gaan naar de invuller).
 Spambescherming: honeypot + minimale invultijd. Getekende huurovereenkomsten worden daarnaast
