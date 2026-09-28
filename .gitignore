@@ -12,3 +12,6 @@ Thumbs.db
 **/private/*.csv
 dev-mail/
 huurovereenkomsten/
+
+# Originele foto-uploads (groot, met GPS): niet in git
+nieuwe-fotos/

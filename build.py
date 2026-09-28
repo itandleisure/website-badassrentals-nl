@@ -71,7 +71,7 @@ NAV = [
     ("/kom-in-contact/", "Contact"),
 ]
 
-IMG_WIDTHS = (480, 960, 1600)
+IMG_WIDTHS = (480, 960, 1600, 2000)
 PHOTO_DIMS = {}  # naam -> (breedte, hoogte, [beschikbare breedtes])
 
 
@@ -93,9 +93,15 @@ def build_images():
         im = ImageOps.exif_transpose(Image.open(src)).convert("RGB")
         for target, x in targets:
             r = im.resize((x, round(h * x / w)), Image.LANCZOS) if x != w else im
-            r.save(target, "WEBP", quality=74, method=6)  # geen EXIF -> geen GPS-data online
+            q = 74 if x <= 960 else 66 if x <= 1600 else 60  # grote formaten iets sterker comprimeren
+            r.save(target, "WEBP", quality=q, method=6)  # geen EXIF -> geen GPS-data online
         ImageOps.fit(im, (1200, 630), Image.LANCZOS).save(og, "JPEG", quality=80, optimize=True, progressive=True)
         print("  foto:", name)
+    # Verouderde varianten (andere breedtes of verwijderde foto's) opruimen
+    expected = {f"{n}-{x}.webp" for n, (_, _, ws) in PHOTO_DIMS.items() for x in ws} | {f"{n}-og.jpg" for n in PHOTO_DIMS}
+    for f in out.iterdir():
+        if f.name not in expected:
+            f.unlink()
 
 
 def img_tag(name, alt, sizes="100vw", cls="", eager=False):
