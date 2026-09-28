@@ -10,11 +10,12 @@
     });
   }
 
-  // Formulieren: tijdstempel tegen spam-bots, knop blokkeren tijdens verzenden, foutmelding tonen
+  // Formulieren: invultijd meten tegen spam-bots, knop blokkeren tijdens verzenden, foutmelding tonen.
+  // De invultijd wordt op het apparaat zelf gemeten, dus een verkeerd ingestelde klok maakt niet uit.
   var params = new URLSearchParams(location.search);
+  var geladen = (window.performance && performance.now) ? function () { return performance.now(); } : null;
+  var start = Date.now();
   document.querySelectorAll('form.js-form').forEach(function (form) {
-    var ts = form.querySelector('input[name="ts"]');
-    if (ts) ts.value = String(Math.floor(Date.now() / 1000));
     var url = form.querySelector('input[name="page"]');
     if (url) url.value = location.pathname;
 
@@ -37,6 +38,8 @@
         alert('Kies minimaal één optie.');
         return;
       }
+      var duur = form.querySelector('input[name="duur"]');
+      if (duur) duur.value = String(Math.round(geladen ? geladen() : Date.now() - start));
       var btn = form.querySelector('button[type="submit"]');
       if (btn) { btn.disabled = true; btn.textContent = 'Bezig met versturen…'; }
 

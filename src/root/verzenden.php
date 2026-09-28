@@ -8,7 +8,7 @@
  *   samenwerking      Samenwerkingsaanvraag (camping, hotel, B&B ...)
  *   huurovereenkomst  Digitale huurovereenkomst via QR-code op een voertuig
  *
- * Spambescherming: honeypot-veld "website" + minimale invultijd via "ts".
+ * Spambescherming: honeypot-veld "website" + minimale invultijd via "duur" (ms, gemeten in de browser).
  * Werkt met PHP mail(). Komen mails niet aan? Laat de hoster SPF/DKIM voor
  * noreply@badassrentals.nl instellen of vervang send_mail() door SMTP (bijv. PHPMailer).
  */
@@ -108,9 +108,10 @@ $cfg  = FORMS[$type];
 $page = field('page', 200);
 $back = $cfg['back'] ?? (preg_match('#^/[a-z0-9\-/]+$#', $page) ? $page : '/');
 
-// Spam: honeypot gevuld of te snel verstuurd -> doen alsof het gelukt is.
-$ts = (int) field('ts', 20);
-if (field('website') !== '' || ($ts > 0 && time() - $ts < 3)) {
+// Spam: honeypot gevuld of binnen 3 seconden na openen verstuurd -> doen alsof het gelukt is.
+// "duur" is de invultijd in milliseconden, gemeten in de browser (onafhankelijk van de klok).
+$duur = field('duur', 20);
+if (field('website') !== '' || ($duur !== '' && (int) $duur < 3000)) {
     go($cfg['thanks']);
 }
 

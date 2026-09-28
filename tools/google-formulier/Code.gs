@@ -46,9 +46,9 @@ function doPost(e) {
   var p = (e && e.parameter) || {};
   var lijsten = (e && e.parameters) || {};   // meerdere waarden, bijv. aangevinkte keuzes
 
-  // Verborgen veld ingevuld of binnen 3 seconden verstuurd = spambot: doen alsof het gelukt is
-  var ts = parseInt(p.ts, 10);
-  if (p.website || (ts && Date.now() / 1000 - ts < 3)) return antwoord({ ok: true });
+  // Verborgen veld ingevuld of binnen 3 seconden na openen verstuurd = spambot: doen alsof het gelukt is.
+  // "duur" is de invultijd in milliseconden, gemeten in de browser (onafhankelijk van de klok).
+  if (p.website || (p.duur !== undefined && p.duur !== '' && parseInt(p.duur, 10) < 3000)) return antwoord({ ok: true });
 
   var type = schoon(p.form, 40);
   var cfg = FORMULIEREN[type];
