@@ -64,7 +64,7 @@ NAV = [
     ("/e-chopper-huren-giethoorn/", "E-chopper"),
     ("/fat-bike-huren-in-giethoorn/", "Fatbike"),
     ("/arrangementen/", "Arrangementen"),
-    ("/teamuitje-met-echopper/", "Teamuitjes"),
+    ("/teamuitje-met-echopper/", "Bedrijfsuitjes"),
     ("/veelgestelde-vragen/", "Vragen"),
     ("/kom-in-contact/", "Contact"),
 ]
@@ -220,7 +220,7 @@ NEWS = []  # gevuld tijdens build: (url, titel, beschrijving, foto, datum, onder
 # Per onderwerp de belangrijkste pagina om naartoe te linken vanuit een artikel
 TOPIC_LINKS = {
     "omgeving": ("/e-chopper-huren-giethoorn/", "e-chopper huren in Giethoorn", "/fat-bike-huren-in-giethoorn/", "een fatbike huren"),
-    "groepen": ("/teamuitje-met-echopper/", "teamuitjes in Giethoorn", "/arrangementen/", "onze arrangementen"),
+    "groepen": ("/teamuitje-met-echopper/", "bedrijfsuitjes in Giethoorn", "/arrangementen/", "onze arrangementen"),
     "beleving": ("/e-chopper-huren-giethoorn/", "e-chopper huren in Giethoorn", "/arrangementen/", "onze arrangementen"),
 }
 
@@ -404,7 +404,7 @@ def layout(page, body, path):
       <ul>
         <li><a href="/e-chopper-huren-giethoorn/">E-chopper huren in Giethoorn</a></li>
         <li><a href="/fat-bike-huren-in-giethoorn/">Fatbike huren in Giethoorn</a></li>
-        <li><a href="/teamuitje-met-echopper/">Teamuitje in Giethoorn</a></li>
+        <li><a href="/teamuitje-met-echopper/">Bedrijfsuitje in Giethoorn</a></li>
         <li><a href="/vrijgezellenfeest-met-elektrische-scooters/">Vrijgezellenfeest</a></li>
         <li><a href="/samenwerking/">Samenwerken</a></li>
         <li><a href="/nieuws/">Nieuws</a></li>
