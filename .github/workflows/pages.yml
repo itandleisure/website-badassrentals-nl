@@ -2,6 +2,7 @@
 #
 # Eenmalig in GitHub: Settings > Pages > Build and deployment > Source: "GitHub Actions",
 # en bij Custom domain: badassrentals.nl (Enforce HTTPS aanzetten zodra het certificaat klaar is).
+# Eerste uitrol: 29-09-2026.
 #
 # PHP-bestanden, .htaccess en de map private/ gaan niet mee: GitHub Pages voert die niet uit
 # en zou ze als tekst tonen. Formulieren lopen via Google Apps Script (GOOGLE_FORM_URL in build.py).
