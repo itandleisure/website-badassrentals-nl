@@ -404,6 +404,9 @@ def layout(page, body, path):
       <ul>
         <li><a href="/e-chopper-huren-giethoorn/">E-chopper huren in Giethoorn</a></li>
         <li><a href="/fat-bike-huren-in-giethoorn/">Fatbike huren in Giethoorn</a></li>
+        <li><a href="/fiets-huren-giethoorn/">Fiets huren in Giethoorn</a></li>
+        <li><a href="/sloep-huren-giethoorn/">Sloep en e-chopper</a></li>
+        <li><a href="/wat-te-doen-in-giethoorn/">Wat te doen in Giethoorn</a></li>
         <li><a href="/teamuitje-met-echopper/">Bedrijfsuitje in Giethoorn</a></li>
         <li><a href="/vrijgezellenfeest-met-elektrische-scooters/">Vrijgezellenfeest</a></li>
         <li><a href="/samenwerking/">Samenwerken</a></li>

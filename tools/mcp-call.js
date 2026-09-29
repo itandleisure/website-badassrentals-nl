@@ -27,7 +27,9 @@ const call = (method, params) => new Promise(res => { const n = ++id; wait[n] = 
     console.log('Schema:', JSON.stringify(s && s.inputSchema).slice(0, 1500));
   }
   if (tool) {
-    const r = await call('tools/call', { name: tool, arguments: argsJson ? JSON.parse(argsJson) : {} });
+    // Argumenten als JSON, of '@bestand.json' om ze uit een bestand te lezen
+    const raw = argsJson && argsJson.startsWith('@') ? require('fs').readFileSync(argsJson.slice(1), 'utf8') : argsJson;
+    const r = await call('tools/call', { name: tool, arguments: raw ? JSON.parse(raw) : {} });
     const txt = JSON.stringify(r.result || r.error);
     if (process.env.OUT) {
       const t = r.result && r.result.content && r.result.content[0] && r.result.content[0].text;
