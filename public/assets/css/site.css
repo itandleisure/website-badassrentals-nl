@@ -106,6 +106,7 @@ p{margin:0 0 1em}
 .section-dark p a{color:#fff}
 .section-head{max-width:720px;margin-bottom:40px}
 .section-head p{color:var(--muted);font-size:1.1rem}
+p,li,.lead{text-wrap:pretty}
 .section-dark .section-head p{color:#c9c4ba}
 .split{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(28px,5vw,64px);align-items:center}
 .split.rev>:first-child{order:2}
