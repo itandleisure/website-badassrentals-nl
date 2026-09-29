@@ -11,7 +11,6 @@ Structuur:
   src/photos/*.jpg     bronfoto's; worden automatisch omgezet naar WebP (meerdere breedtes)
   src/assets/          css, js, fonts, logo, pdf's -> /assets/
   src/root/            bestanden voor de webroot (.htaccess, robots.txt, verzenden.php ...)
-  vehicles.py          lijst met e-choppers (QR-huurovereenkomsten)
 
 Vereist: Python 3.9+ en Pillow (pip install pillow).
 """
@@ -26,7 +25,6 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-from vehicles import ECHOPPERS
 
 ROOT = Path(__file__).parent
 SRC = ROOT / "src"
@@ -461,29 +459,6 @@ def write_page(path, content):
     target.write_text(content, encoding="utf-8")
 
 
-def vehicle_pages():
-    """Digitale huurovereenkomsten achter de QR-codes op de voertuigen (/algemene-voorwaarden/verhuur-.../, zoals op de oude site)."""
-    tpl = (SRC / "templates" / "huurovereenkomst.html").read_text(encoding="utf-8")
-    pages = []
-    for nr, plate in ECHOPPERS:
-        slug = f"verhuur-e-chopper-nummer-{nr}-met-kenteken-{plate.lower()}"
-        label = f"E-chopper nummer {nr} met kenteken {plate}"
-        pages.append((slug, "E-chopper", label, "e-chopper"))
-    pages.append(("verhuur-fatbikes-algemene-voorwaarden", "Fatbike", "Fatbike", "fatbike"))
-    out = []
-    for slug, kind, label, key in pages:
-        body = (tpl.replace("{{kind}}", kind).replace("{{vehicle}}", label).replace("{{vehicle_key}}", key)
-                .replace("{{kind_lower}}", kind.lower()))
-        body = re.sub(r"\{%\s*if (\w+)\s*%\}(.*?)\{%\s*endif\s*%\}",
-                      lambda m: m.group(2) if m.group(1) == key.replace("-", "") else "", body, flags=re.S)
-        meta = {"title": f"Huurovereenkomst {label} | Badass Rentals",
-                "description": f"Digitale huurovereenkomst voor {label.lower()} van Badass Rentals in Giethoorn.",
-                "noindex": True, "body_class": "page-plain"}
-        # Zelfde pad als op de oude WordPress-site (subpagina van /algemene-voorwaarden/): hier wijzen de QR-codes naar
-        out.append((f"/algemene-voorwaarden/{slug}/", meta, body))
-    return out
-
-
 def htaccess_rules():
     """Leest de 301-regels uit src/root/.htaccess (regels zonder RewriteCond)."""
     rules, cond = [], False
@@ -505,7 +480,6 @@ def redirect_stubs():
     De lijst oude adressen staat in tools/old-urls.txt; de bestemming komt uit .htaccess (één bron)."""
     rules = htaccess_rules()
     old = (ROOT / "tools" / "old-urls.txt").read_text().split()
-    old += [f"/verhuur-e-chopper-nummer-{nr}-met-kenteken-{plate.lower()}/" for nr, plate in ECHOPPERS]
     made = 0
     for path in dict.fromkeys(old):
         rel = path.lstrip("/")
@@ -576,7 +550,6 @@ def main():
         if meta.get("article"):
             NEWS.append((page_path(f), meta.get("h1", meta["title"]), meta["description"], meta["image"], meta["date"],
                          meta.get("topic", "beleving")))
-    pages += vehicle_pages()
 
     print("Pagina's...")
     sitemap = []

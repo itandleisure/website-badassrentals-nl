@@ -2,7 +2,7 @@
    ---------------------------------------------------------------
    Dit script hoort bij een Google Sheet (Extensies → Apps Script).
    - Elk formulier van badassrentals.nl komt als nieuwe regel in een eigen tabblad:
-     Contact, Teamuitjes, Samenwerking en Huurovereenkomsten.
+     Contact, Teamuitjes en Samenwerking.
    - Er gaat meteen een e-mail naar ONTVANGER (antwoorden gaat rechtstreeks naar de invuller).
    - Regels ouder dan de bewaartermijn per tabblad worden elke nacht automatisch verwijderd (privacy).
 
@@ -31,13 +31,6 @@ var FORMULIEREN = {
     tabblad: 'Samenwerking', bewaarMaanden: 12, onderwerp: 'Aanvraag samenwerking',
     velden: [['naam', 'Naam'], ['bedrijf', 'Bedrijf'], ['type_bedrijf', 'Type bedrijf'], ['site', 'Website'],
       ['email', 'E-mail'], ['telefoon', 'Telefoon'], ['bericht', 'Bericht']]
-  },
-  huurovereenkomst: {
-    // Langer bewaren: nodig bij schade, boetes of diefstal die later bekend worden
-    tabblad: 'Huurovereenkomsten', bewaarMaanden: 24, onderwerp: 'Huurovereenkomst getekend',
-    velden: [['voertuig', 'Voertuig'], ['naam', 'Naam huurder'], ['email', 'E-mail'], ['telefoon', 'Telefoon'],
-      ['start', 'Start verhuur'], ['akkoord', 'Akkoord voorwaarden'], ['afkoop', 'Afkoopregeling afgenomen'],
-      ['versie', 'Versie voorwaarden']]
   }
 };
 
@@ -67,13 +60,6 @@ function doPost(e) {
   if (!g.naam) fouten.push('naam');
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.email)) fouten.push('email');
   if (type === 'contact' && !g.bericht) fouten.push('bericht');
-  if (type === 'huurovereenkomst') {
-    if (!g.voertuig) fouten.push('voertuig');
-    if (!g.telefoon) fouten.push('telefoon');
-    if (g.akkoord !== 'ja') fouten.push('akkoord');
-    g.akkoord = g.akkoord === 'ja' ? 'Ja' : 'Nee';
-    g.afkoop = g.afkoop === 'ja' ? 'Ja' : 'Nee';
-  }
   if (fouten.length) return antwoord({ ok: false, fout: 'velden', velden: fouten });
 
   // 1. Opslaan in de spreadsheet (slot voorkomt dat twee inzendingen tegelijk botsen)
@@ -89,8 +75,7 @@ function doPost(e) {
 
   // 2. E-mail sturen. Lukt dat niet, dan staat de inzending in ieder geval al in de spreadsheet.
   try {
-    var extra = type === 'huurovereenkomst' ? ': ' + g.voertuig + ' - ' + g.naam
-      : type === 'teamuitje' && g.personen ? ': ' + g.naam + ' (' + g.personen + ' pers.)'
+    var extra = type === 'teamuitje' && g.personen ? ': ' + g.naam + ' (' + g.personen + ' pers.)'
       : ': ' + (g.bedrijf || g.naam);
     stuurMail(cfg, g, cfg.onderwerp + extra);
   } catch (fout) {

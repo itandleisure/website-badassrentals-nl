@@ -48,8 +48,7 @@
       var googleUrl = document.body.getAttribute('data-google-form');
       if (!googleUrl || !window.fetch || !window.AbortController) return;
       e.preventDefault();
-      var type = (form.querySelector('input[name="form"]') || {}).value;
-      var bedankt = type === 'huurovereenkomst' ? '/huurovereenkomst-ontvangen/' : '/bedankt/';
+      var bedankt = '/bedankt/';
       var stop = new AbortController();
       var timer = setTimeout(function () { stop.abort(); }, 15000);
       fetch(googleUrl, { method: 'POST', body: new URLSearchParams(new FormData(form)), signal: stop.signal })
@@ -94,11 +93,4 @@
   openHashTarget();
   window.addEventListener('hashchange', openHashTarget);
 
-  // Datum/tijd standaard op nu (huurovereenkomst)
-  var dt = document.querySelector('input[type="datetime-local"][data-now]');
-  if (dt && !dt.value) {
-    var d = new Date();
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    dt.value = d.toISOString().slice(0, 16);
-  }
 })();

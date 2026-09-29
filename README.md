@@ -12,8 +12,6 @@ https://verhuur.badassrentals.nl.
 | `src/photos/` | Bronfoto's (JPG, zonder EXIF/GPS). Worden automatisch WebP in 480/960/1600 px |
 | `src/assets/` | CSS, JS, fonts (lokaal gehost), logo/favicons, voorwaarden-PDF's |
 | `src/root/` | Webroot-bestanden: `.htaccess` (redirects, caching), `robots.txt`, `verzenden.php` |
-| `src/templates/huurovereenkomst.html` | Sjabloon voor de QR-huurovereenkomst per voertuig |
-| `vehicles.py` | Lijst e-choppers + kentekens (QR-pagina's) |
 | `build.py` | Bouwt alles naar `public/` |
 | `public/` | **De site die online moet.** Wordt automatisch uitgerold (zie Uitrollen) |
 
@@ -47,7 +45,6 @@ python tools/mailcatcher.py                 # vangt mails op in dev-mail/*.eml
 php -S localhost:8000 -t public             # site mét werkende formulieren
 ```
 
-Getekende huurovereenkomsten komen lokaal in `huurovereenkomsten/` (niet in git).
 
 ## Pagina bewerken
 
@@ -66,8 +63,8 @@ Het verschijnt vanzelf op /nieuws/ en in de sitemap.
 
 **Google Sheets + e-mail (zoals bij coworkingcompeta.com).** Staat `GOOGLE_FORM_URL` in `build.py` ingevuld,
 dan stuurt `site.js` elk formulier naar het Google Apps Script `tools/google-formulier/Code.gs`.
-Dat zet de inzending in een eigen tabblad (Contact, Teamuitjes, Samenwerking, Huurovereenkomsten)
-en mailt info@badassrentals.nl. Opruimen gaat automatisch: 12 maanden, huurovereenkomsten 24 maanden.
+Dat zet de inzending in een eigen tabblad (Contact, Teamuitjes, Samenwerking)
+en mailt info@badassrentals.nl. Opruimen gaat automatisch na 12 maanden.
 Lukt Google niet, dan gaat het formulier automatisch via `verzenden.php` (hieronder).
 
 Eenmalig instellen:
@@ -82,8 +79,7 @@ Script later gewijzigd? Implementeren > Implementaties beheren > bewerken > Nieu
 
 Alle formulieren posten naar `/verzenden.php` en worden gemaild naar **info@badassrentals.nl**
 (afzender `noreply@badassrentals.nl`, antwoorden gaan naar de invuller).
-Spambescherming: honeypot + minimale invultijd. Getekende huurovereenkomsten worden daarnaast
-als CSV bewaard in `../huurovereenkomsten/` (buiten de webroot) of anders in `private/` (afgeschermd).
+Spambescherming: honeypot + minimale invultijd.
 
 Vereist PHP 7.4+ met werkende `mail()`. Zorg dat SPF/DKIM voor badassrentals.nl de webserver toestaat,
 anders kunnen mails in spam belanden.
@@ -92,11 +88,11 @@ anders kunnen mails in spam belanden.
 
 De reviews staan in `build.py` (lijst `REVIEWS`): echte 5-sterren Google-reviews. Nieuwe review toevoegen = regel toevoegen en opnieuw bouwen.
 
-## QR-codes op voertuigen
+## QR-codes
 
-De URL's `/algemene-voorwaarden/verhuur-e-chopper-nummer-X-met-kenteken-.../`, `/algemene-voorwaarden/verhuur-fatbikes-algemene-voorwaarden/`,
-`/qrcode/`, `/qr-code-nederlands|engels|duits/` en `/instagram/` zijn exact behouden, zodat bestaande
-QR-stickers en de Instagram-bio blijven werken. Nieuwe e-chopper? Voeg een regel toe aan `vehicles.py`.
+De digitale huurovereenkomsten (QR-codes op de voertuigen) worden niet meer gebruikt. De oude adressen
+(`/algemene-voorwaarden/verhuur-e-chopper-...`) sturen door naar de algemene voorwaarden.
+`/qrcode/`, `/qr-code-nederlands|engels|duits/` en `/instagram/` bestaan nog wel.
 
 ## Controles
 
