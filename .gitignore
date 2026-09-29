@@ -15,3 +15,6 @@ huurovereenkomsten/
 
 # Originele foto-uploads (groot, met GPS): niet in git
 nieuwe-fotos/
+
+# Lokale MCP-koppelingen (Search Console, DataForSEO): niet in de openbare repository
+.mcp.json
