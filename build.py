@@ -507,11 +507,11 @@ LABELS = {
 }
 # Vlaggetjes voor de taalwissel als inline SVG (vlag-emoji's werken niet op Windows)
 FLAGS = {
-    "nl": '<svg class="flag" viewBox="0 0 9 6" aria-hidden="true"><rect width="9" height="6" fill="#21468B"/>'
+    "nl": '<svg class="flag" width="21" height="14" viewBox="0 0 9 6" aria-hidden="true"><rect width="9" height="6" fill="#21468B"/>'
           '<rect width="9" height="4" fill="#fff"/><rect width="9" height="2" fill="#AE1C28"/></svg>',
-    "de": '<svg class="flag" viewBox="0 0 5 3" aria-hidden="true"><rect width="5" height="3" fill="#FFCE00"/>'
+    "de": '<svg class="flag" width="21" height="14" viewBox="0 0 5 3" aria-hidden="true"><rect width="5" height="3" fill="#FFCE00"/>'
           '<rect width="5" height="2" fill="#D00"/><rect width="5" height="1" fill="#000"/></svg>',
-    "en": '<svg class="flag" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'
+    "en": '<svg class="flag" width="21" height="14" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'
           '<clipPath id="flag-uk-t"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath>'
           '<rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/>'
           '<path d="M0,0 60,30M60,0 0,30" clip-path="url(#flag-uk-t)" stroke="#C8102E" stroke-width="4"/>'
@@ -715,7 +715,10 @@ def redirect_stubs():
     return made
 
 
-VERSION = date.today().strftime("%Y%m%d")
+# Versie voor css/js-links: verandert bij elke wijziging van site.css of site.js, zodat browsers nooit een oude versie gebruiken
+import hashlib
+VERSION = hashlib.sha1(b"".join((SRC / "assets" / d / f).read_bytes()
+                                for d, f in (("css", "site.css"), ("js", "site.js")))).hexdigest()[:10]
 
 
 def main():
