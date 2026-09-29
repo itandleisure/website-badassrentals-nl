@@ -499,11 +499,14 @@ def footer_de():
 
 LABELS = {
     "nl": {"skip": "Direct naar de inhoud", "start": "Start bij", "in": "in", "home": "/", "crumbs": "Kruimelpad",
-           "brand": "Badass Rentals, naar de homepage", "menu": "Hoofdmenu", "book": "Reserveren", "locale": "nl_NL"},
+           "brand": "Badass Rentals, naar de homepage", "menu": "Hoofdmenu", "book": "Reserveren", "locale": "nl_NL",
+           "phone": BUSINESS["phone_display"]},
     "en": {"skip": "Skip to content", "start": "Meeting point:", "in": "in", "home": "/en/", "crumbs": "Breadcrumb",
-           "brand": "Badass Rentals, to the homepage", "menu": "Main menu", "book": "Book now", "locale": "en_GB"},
+           "brand": "Badass Rentals, to the homepage", "menu": "Main menu", "book": "Book now", "locale": "en_GB",
+           "phone": "+31 85 004 7700"},
     "de": {"skip": "Direkt zum Inhalt", "start": "Treffpunkt:", "in": "in", "home": "/de/", "crumbs": "Brotkrümelnavigation",
-           "brand": "Badass Rentals, zur Startseite", "menu": "Hauptmenü", "book": "Jetzt buchen", "locale": "de_DE"},
+           "brand": "Badass Rentals, zur Startseite", "menu": "Hauptmenü", "book": "Jetzt buchen", "locale": "de_DE",
+           "phone": "+31 85 004 7700"},
 }
 # Vlaggetjes voor de taalwissel als inline SVG (vlag-emoji's werken niet op Windows)
 FLAGS = {
@@ -607,7 +610,7 @@ def layout(page, body, path):
 <a class="skip" href="#main">{T["skip"]}</a>
 <div class="topbar"><div class="wrap topbar-inner">
   <span>{T['start']} {BUSINESS['location']}, {BUSINESS['street']} {T['in']} {BUSINESS['city']}</span>
-  <span class="topbar-links"><a href="tel:{BUSINESS['phone']}">{BUSINESS['phone_display']}</a><a href="mailto:{BUSINESS['email']}">{BUSINESS['email']}</a></span>
+  <span class="topbar-links"><a href="tel:{BUSINESS['phone']}">{T['phone']}</a><a href="mailto:{BUSINESS['email']}">{BUSINESS['email']}</a></span>
 </div></div>
 <header class="site-header">
   <div class="wrap header-inner">
