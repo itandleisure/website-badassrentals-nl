@@ -23,7 +23,9 @@ def main():
     pages = {}
     for f in glob.glob("**/index.html", recursive=True):
         s = open(f, encoding="utf-8").read()
-        path = "/" + Path(f).parent.as_posix().strip(".") + "/"
+        if '<main id="main">' not in s:  # doorverwijspagina's voor oude URL's overslaan
+            continue
+        path ="/" + Path(f).parent.as_posix().strip(".") + "/"
         path = path.replace("//", "/")
         main_html = s.split('<main id="main">')[1].split("</main>")[0]
         pages[path] = dict(
