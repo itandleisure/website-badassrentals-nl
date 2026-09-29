@@ -3,6 +3,12 @@ title: Pagina niet gevonden | Badass Rentals
 description: Deze pagina bestaat niet (meer).
 noindex: true
 ---
+<script>
+  // Oude QR-adressen van de digitale huurovereenkomsten (met kenteken in de URL) -> algemene voorwaarden
+  if (/^\/(algemene-voorwaarden\/)?verhuur-e-chopper-nummer-\d+-met-kenteken-/i.test(location.pathname)) {
+    location.replace('/algemene-voorwaarden/');
+  }
+</script>
 <section class="section">
   <div class="wrap prose" style="margin:0 auto">
     <span class="eyebrow">404</span>
