@@ -48,7 +48,7 @@ BUSINESS = {
 # Web-app-URL van het Google Apps Script (tools/google-formulier/Code.gs), eindigt op /exec.
 # Gevuld: formulieren gaan naar Google Sheets + e-mail, met verzenden.php als reserveroute.
 # Leeg: formulieren gaan alleen via verzenden.php.
-GOOGLE_FORM_URL = "https://script.google.com/macros/s/AKfycbyy8taGpWzmWdXBV3V5vTizZnZ5_H7fKKpLoQ_zpTNB_PTwJNP1NzUFsLWYy-Wiee66/exec"
+GOOGLE_FORM_URL = "https://script.google.com/macros/s/AKfycbzPe_NEEl7t8-9Yz2--itRWPIK6RwAdLtbFX-fLXfFkMIfVrw3zevREEW5yWb77gb0qjg/exec"
 
 # Links naar het boekingssysteem. Deze URL's niet wijzigen zonder de boekingsomgeving te controleren.
 BOOK = {
