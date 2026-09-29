@@ -60,8 +60,12 @@ BOOK = {
     "cityescape": "https://verhuur.badassrentals.nl/product/city-escape-giethoorn",
 }
 
-# Het boekingssysteem heeft een Engelse versie onder /en/
-BOOK_EN = {k: v.replace("verhuur.badassrentals.nl/", "verhuur.badassrentals.nl/en/") for k, v in BOOK.items()}
+# Het boekingssysteem heeft ook een Engelse (/en/) en Duitse (/de/) versie
+BOOK_L = {"nl": BOOK}
+for _l in ("en", "de"):
+    BOOK_L[_l] = {k: v.replace("verhuur.badassrentals.nl/", f"verhuur.badassrentals.nl/{_l}/") for k, v in BOOK.items()}
+BOOK_EN = BOOK_L["en"]
+LANGS = ("nl", "en", "de")
 
 NAV = [
     ("/e-chopper-huren-giethoorn/", "E-chopper"),
@@ -78,9 +82,17 @@ NAV_EN = [
     ("/en/things-to-do-in-giethoorn/", "Things to do"),
     ("/en/faq/", "FAQ & contact"),
 ]
+NAV_DE = [
+    ("/de/e-chopper-mieten-giethoorn/", "E-Chopper"),
+    ("/de/fatbike-mieten-giethoorn/", "Fatbike"),
+    ("/de/touren/", "Touren"),
+    ("/de/sehenswuerdigkeiten-giethoorn/", "Sehenswürdigkeiten"),
+    ("/de/faq/", "FAQ & Kontakt"),
+]
+NAV_L = {"nl": NAV, "en": NAV_EN, "de": NAV_DE}
 
-# Engelse pagina's staan in src/pages/en/ en noemen hun Nederlandse tegenhanger in 'alternate:'.
-# Tijdens de build gevuld: pad -> {"nl": pad, "en": pad} (voor hreflang en de taalwissel)
+# Anderstalige pagina's staan in src/pages/<taal>/ en noemen hun Nederlandse tegenhanger in 'alternate:'.
+# Tijdens de build gevuld: pad -> {"nl": pad, "en": pad, "de": pad} (voor hreflang en de taalwissel)
 ALTERNATES = {}
 
 IMG_WIDTHS = (480, 960, 1600, 2000)
@@ -135,8 +147,8 @@ def img_tag(name, alt, sizes="100vw", cls="", eager=False):
 
 # --------------------------------------------------------------------------- shortcodes
 def render_shortcodes(body, page):
-    en = page.get("lang") == "en"
-    for k, v in (BOOK_EN if en else BOOK).items():
+    lang = page.get("lang", "nl")
+    for k, v in BOOK_L[lang].items():
         body = body.replace("{{book.%s}}" % k, v)
     for k, v in BUSINESS.items():
         body = body.replace("{{biz.%s}}" % k, v)
@@ -172,8 +184,8 @@ def render_shortcodes(body, page):
     body = re.sub(r"\{%\s*faq\s*%\}(.*?)\{%\s*endfaq\s*%\}", faq, body, flags=re.S)
 
     body = re.sub(r"\{%\s*reviews\s*%\}", lambda m: reviews_html(), body)
-    body = re.sub(r"\{%\s*cta\s*%\}", lambda m: cta_html(en), body)
-    body = re.sub(r"\{%\s*usps\s*%\}", lambda m: usps_html(en), body)
+    body = re.sub(r"\{%\s*cta\s*%\}", lambda m: cta_html(lang), body)
+    body = re.sub(r"\{%\s*usps\s*%\}", lambda m: usps_html(lang), body)
     body = re.sub(r"\{%\s*news\s*(\d*)\s*%\}", lambda m: news_html(int(m.group(1)) if m.group(1) else None), body)
     return body
 
@@ -205,23 +217,41 @@ def reviews_html():
             f'<p class="reviews-more"><a class="link-arrow" href="{GOOGLE_REVIEWS_URL}" rel="noopener">Bekijk alle reviews op Google</a></p>')
 
 
-def usps_html(en=False):
-    items = [
+def usps_html(lang="nl"):
+    items = {"de": [
+        ("30+ E-Chopper & 15 Fatbikes", "Für Paare, Familien und Gruppen jeder Größe."),
+        ("Panne? Wir kommen zu Ihnen", "Wir bringen sofort Ersatz, damit Sie schnell weiterfahren können."),
+        ("Die schönsten Routen", "GPS-Routen durch Giethoorn und den Nationalpark Weerribben-Wieden."),
+        ("Bestens gewartet", "Alle E-Chopper und Fatbikes werden regelmäßig geprüft und gewartet."),
+    ], "en": [
         ("30+ e-choppers & 15 fat bikes", "For couples, families and groups of any size."),
         ("Breakdown? We come to you", "We bring a replacement right away, so you can keep going."),
         ("The best routes", "GPS routes through Giethoorn and Weerribben-Wieden National Park."),
         ("Well maintained", "Every e-chopper and fat bike is checked and serviced regularly."),
-    ] if en else [
+    ], "nl": [
         ("30+ e-choppers & 15 fatbikes", "Voor kleine en grote groepen; boven 30 personen met een wisselprogramma."),
         ("Pech onderweg? Wij komen eraan", "We regelen direct vervangend vervoer, zodat je snel weer verder kunt."),
         ("Mooiste routes", "GPS-routes door Giethoorn en Nationaal Park Weerribben-Wieden."),
         ("Goed onderhouden", "We controleren en onderhouden alle tweewielers periodiek."),
-    ]
+    ]}[lang]
     return '<ul class="usps">' + "".join(f"<li><strong>{a}</strong><span>{b}</span></li>" for a, b in items) + "</ul>"
 
 
-def cta_html(en=False):
-    if en:
+def cta_html(lang="nl"):
+    if lang == "de":
+        return f"""<section class="cta-band">
+  <div class="wrap cta-band-inner">
+    <div>
+      <h2>Bereit zum Cruisen?</h2>
+      <p>Wählen Sie Datum und Uhrzeit und buchen Sie direkt online.</p>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-accent" href="{BOOK_L['de']['echopper']}">E-Chopper buchen</a>
+      <a class="btn btn-ghost-light" href="{BOOK_L['de']['fatbike']}">Fatbike buchen</a>
+    </div>
+  </div>
+</section>"""
+    if lang == "en":
         return f"""<section class="cta-band">
   <div class="wrap cta-band-inner">
     <div>
@@ -286,9 +316,9 @@ def related_html(path, topic):
 
 
 # --------------------------------------------------------------------------- layout
-def nav_html(path, en=False):
+def nav_html(path, lang="nl"):
     items = []
-    for href, label in (NAV_EN if en else NAV):
+    for href, label in NAV_L[lang]:
         cur = ' aria-current="page"' if path.startswith(href) else ""
         items.append(f'<li><a href="{href}"{cur}>{label}</a></li>')
     return "".join(items)
@@ -419,12 +449,63 @@ def footer_en():
 </footer>"""
 
 
+def footer_de():
+    return f"""<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <img src="/assets/brand/logo-white.webp" width="72" height="72" alt="" loading="lazy">
+      <p>E-Chopper und E-Fatbikes mieten in Giethoorn. Cruisen Sie durch den Nationalpark Weerribben-Wieden, zu zweit oder mit der ganzen Gruppe.</p>
+      <p class="social"><a href="{BUSINESS['facebook']}" rel="noopener">Facebook</a><a href="{BUSINESS['instagram']}" rel="noopener">Instagram</a></p>
+    </div>
+    <div>
+      <h2>Online buchen</h2>
+      <ul>
+        <li><a href="{BOOK_L['de']['echopper']}">E-Chopper buchen</a></li>
+        <li><a href="{BOOK_L['de']['fatbike']}">Fatbike buchen</a></li>
+        <li><a href="{BOOK_L['de']['ontdek']}">Tour: Giethoorn &amp; Weerribben entdecken</a></li>
+        <li><a href="{BOOK_L['de']['evening']}">Evening Chopper Tour</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Entdecken</h2>
+      <ul>
+        <li><a href="/de/">E-Chopper &amp; Fatbike mieten</a></li>
+        <li><a href="/de/e-chopper-mieten-giethoorn/">E-Chopper mieten in Giethoorn</a></li>
+        <li><a href="/de/fatbike-mieten-giethoorn/">Fatbike mieten in Giethoorn</a></li>
+        <li><a href="/de/touren/">Touren: E-Chopper &amp; Boot</a></li>
+        <li><a href="/de/sehenswuerdigkeiten-giethoorn/">Sehenswürdigkeiten in Giethoorn</a></li>
+        <li><a href="/de/faq/">FAQ &amp; Kontakt</a></li>
+        <li><a href="/" hreflang="nl" lang="nl">Nederlandse website</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Kontakt</h2>
+      <address>
+        {BUSINESS['name']}<br>
+        Treffpunkt: {BUSINESS['location']}<br>
+        {BUSINESS['street']}, {BUSINESS['postal']} {BUSINESS['city']}, Niederlande<br>
+        <a href="tel:{BUSINESS['phone']}">+31 85 004 7700</a><br>
+        <a href="mailto:{BUSINESS['email']}">{BUSINESS['email']}</a>
+      </address>
+      <p><a class="link-arrow" href="{BUSINESS['maps']}" rel="noopener">Route planen</a></p>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>&copy; 2021 - {date.today().year} Badass Rentals</span>
+    <span><a href="/algemene-voorwaarden/" hreflang="nl">AGB (Niederländisch)</a><a href="/privacyverklaring/" hreflang="nl">Datenschutz (Niederländisch)</a><a href="/de/faq/">FAQ</a></span>
+  </div>
+</footer>"""
+
+
 LABELS = {
     "nl": {"skip": "Direct naar de inhoud", "start": "Start bij", "in": "in", "home": "/", "crumbs": "Kruimelpad",
-           "brand": "Badass Rentals, naar de homepage", "menu": "Hoofdmenu", "book": "Reserveren"},
+           "brand": "Badass Rentals, naar de homepage", "menu": "Hoofdmenu", "book": "Reserveren", "locale": "nl_NL"},
     "en": {"skip": "Skip to content", "start": "Meeting point:", "in": "in", "home": "/en/", "crumbs": "Breadcrumb",
-           "brand": "Badass Rentals, to the homepage", "menu": "Main menu", "book": "Book now"},
+           "brand": "Badass Rentals, to the homepage", "menu": "Main menu", "book": "Book now", "locale": "en_GB"},
+    "de": {"skip": "Direkt zum Inhalt", "start": "Treffpunkt:", "in": "in", "home": "/de/", "crumbs": "Brotkrümelnavigation",
+           "brand": "Badass Rentals, zur Startseite", "menu": "Hauptmenü", "book": "Jetzt buchen", "locale": "de_DE"},
 }
+FOOTERS = {"nl": lambda: footer_nl(), "en": lambda: footer_en(), "de": lambda: footer_de()}
 
 
 def layout(page, body, path):
@@ -434,8 +515,8 @@ def layout(page, body, path):
     og_img = SITE + f"/assets/img/{page.get('image', 'groep-e-choppers-fatbikes-giethoorn')}-og.jpg"
     robots = "noindex, follow" if page.get("noindex") else "index, follow, max-image-preview:large"
 
-    en = page.get("lang") == "en"
-    T = LABELS["en" if en else "nl"]
+    lang = page.get("lang", "nl")
+    T = LABELS[lang]
     schemas = [local_business_schema()] if path == "/" else []
     if page.get("crumb") and path != "/":
         crumbs = [{"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"}]
@@ -474,15 +555,15 @@ def layout(page, body, path):
     body_class = page.get("body_class", "")
     alt = ALTERNATES.get(path, {})
     hreflang = ""
-    if alt.get("en"):
-        hreflang = (f'<link rel="alternate" hreflang="nl" href="{SITE}{alt["nl"]}">\n'
-                    f'<link rel="alternate" hreflang="en" href="{SITE}{alt["en"]}">\n'
-                    f'<link rel="alternate" hreflang="x-default" href="{SITE}{alt["nl"]}">\n')
-    other = alt.get("nl" if en else "en") or ("/" if en else "/en/")
-    switch = (f'<li><a class="lang-switch" href="{other}" title="{"Nederlands" if en else "English"}" aria-label="{"Nederlands" if en else "English"}" hreflang="{"nl" if en else "en"}" lang="{"nl" if en else "en"}">'
-              f'{"NL" if en else "EN"}</a></li>')
+    if len(alt) > 1:
+        hreflang = "".join(f'<link rel="alternate" hreflang="{l}" href="{SITE}{alt[l]}">\n' for l in LANGS if l in alt)
+        hreflang += f'<link rel="alternate" hreflang="x-default" href="{SITE}{alt["nl"]}">\n'
+    names = {"nl": "Nederlands", "en": "English", "de": "Deutsch"}
+    switch = "".join(
+        f'<li><a class="lang-switch" href="{alt.get(l) or LABELS[l]["home"]}" title="{names[l]}" aria-label="{names[l]}" '
+        f'hreflang="{l}" lang="{l}">{l.upper()}</a></li>' for l in LANGS if l != lang)
     return f"""<!doctype html>
-<html lang="{"en" if en else "nl"}">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -491,7 +572,7 @@ def layout(page, body, path):
 <meta name="robots" content="{robots}">
 <link rel="canonical" href="{canonical}">
 {hreflang}<meta property="og:type" content="{'article' if page.get('article') else 'website'}">
-<meta property="og:locale" content="{"en_GB" if en else "nl_NL"}">
+<meta property="og:locale" content="{T["locale"]}">
 <meta property="og:site_name" content="Badass Rentals">
 <meta property="og:title" content="{html.escape(page.get('og_title', title))}">
 <meta property="og:description" content="{html.escape(desc)}">
@@ -524,8 +605,8 @@ def layout(page, body, path):
     </a>
     <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav"><span></span><span class="sr">Menu</span></button>
     <nav id="site-nav" class="site-nav" aria-label="{T["menu"]}">
-      <ul>{nav_html(path, en)}{switch}</ul>
-      <a class="btn btn-accent btn-sm" href="{(BOOK_EN if en else BOOK)['root']}">{T["book"]}</a>
+      <ul>{nav_html(path, lang)}{switch}</ul>
+      <a class="btn btn-accent btn-sm" href="{BOOK_L[lang]['root']}">{T["book"]}</a>
     </nav>
   </div>
 </header>
@@ -533,7 +614,7 @@ def layout(page, body, path):
 <main id="main">
 {body}
 </main>
-{footer_en() if en else footer_nl()}
+{FOOTERS[lang]()}
 <script src="/assets/js/site.js?v={VERSION}" defer></script>
 </body>
 </html>
@@ -651,14 +732,17 @@ def main():
     shutil.copy2(SRC / "assets" / "brand" / "favicon.ico", OUT / "favicon.ico")
 
     pages = []
-    for f in sorted((SRC / "pages").glob("*.html")) + sorted((SRC / "pages" / "en").glob("*.html")):
+    for f in sorted((SRC / "pages").glob("*.html")) + [f for l in LANGS[1:] for f in sorted((SRC / "pages" / l).glob("*.html"))]:
         meta, body = parse_page(f.read_text(encoding="utf-8"))
         path = page_path(f)
-        if f.parent.name == "en":
-            meta["lang"] = "en"
-            path = "/en" + path
+        if f.parent.name in LANGS:
+            lang = f.parent.name
+            meta["lang"] = lang
+            path = f"/{lang}" + path
             if meta.get("alternate"):
-                ALTERNATES[path] = ALTERNATES[meta["alternate"]] = {"nl": meta["alternate"], "en": path}
+                group = ALTERNATES.setdefault(meta["alternate"], {"nl": meta["alternate"]})
+                group[lang] = path
+                ALTERNATES[path] = group
         pages.append((path, meta, body))
         if meta.get("article"):
             NEWS.append((page_path(f), meta.get("h1", meta["title"]), meta["description"], meta["image"], meta["date"],
