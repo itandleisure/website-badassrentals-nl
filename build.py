@@ -423,7 +423,7 @@ def layout(page, body, path):
     </div>
   </div>
   <div class="wrap footer-bottom">
-    <span>&copy; {date.today().year} Badass Rentals</span>
+    <span>&copy; 2021 - {date.today().year} Badass Rentals</span>
     <span><a href="/algemene-voorwaarden/">Algemene voorwaarden</a><a href="/privacyverklaring/">Privacyverklaring</a><a href="/veelgestelde-vragen/">Veelgestelde vragen</a></span>
   </div>
 </footer>
