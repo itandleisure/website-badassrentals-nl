@@ -17,15 +17,17 @@ https://verhuur.badassrentals.nl.
 | `build.py` | Bouwt alles naar `public/` |
 | `public/` | **De site die online moet.** Wordt automatisch uitgerold (zie Uitrollen) |
 
-## Uitrollen (GitHub is leidend)
+## Uitrollen: GitHub Pages
 
-Elke push naar `main` met wijzigingen in `public/` zet de site automatisch op de Vimexx-hosting via
-FTPS (`.github/workflows/deploy.yml`). Werkwijze: pas `src/` aan, draai `python build.py`, commit en push.
+De site draait op **GitHub Pages**. Elke push naar `main` met wijzigingen in `public/` zet de site automatisch
+online (`.github/workflows/pages.yml`). Werkwijze: pas `src/` aan, draai `python build.py`, commit en push.
 
-Eenmalig in GitHub instellen (Settings > Secrets and variables > Actions): `FTP_SERVER`, `FTP_USERNAME`,
-`FTP_PASSWORD` en `FTP_DIR` (meestal `/domains/badassrentals.nl/public_html`).
-Er wordt standaard niets verwijderd op de server. Oude bestanden opruimen: Actions > Deploy > Run workflow
-met "opruimen" aangevinkt (huurovereenkomsten en caches blijven staan).
+- Eenmalig: Settings > Pages > Source: **GitHub Actions**, Custom domain: `badassrentals.nl`, daarna **Enforce HTTPS**.
+- Oude URL's: GitHub Pages kent geen `.htaccess`. Het buildscript maakt daarom op elk oud adres
+  (tools/old-urls.txt + korte QR-adressen) een doorverwijspagina, met de bestemming uit `src/root/.htaccess`.
+- PHP, `.htaccess` en `private/` worden niet mee geüpload. Formulieren lopen via Google Apps Script;
+  lukt dat niet, dan ziet de bezoeker een melding met telefoonnummer en e-mailadres.
+- `.htaccess` en `verzenden.php` blijven in de repository voor als de site ooit weer op eigen hosting komt.
 
 ## Bouwen
 

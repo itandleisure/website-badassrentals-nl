@@ -1,0 +1,54 @@
+# Zet de website (map public/) op GitHub Pages bij elke push naar main.
+#
+# Eenmalig in GitHub: Settings > Pages > Build and deployment > Source: "GitHub Actions",
+# en bij Custom domain: badassrentals.nl (Enforce HTTPS aanzetten zodra het certificaat klaar is).
+#
+# PHP-bestanden, .htaccess en de map private/ gaan niet mee: GitHub Pages voert die niet uit
+# en zou ze als tekst tonen. Formulieren lopen via Google Apps Script (GOOGLE_FORM_URL in build.py).
+
+name: GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["public/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Site samenstellen (zonder serverbestanden)
+        run: |
+          set -euo pipefail
+          test -f public/index.html
+          test -f public/CNAME
+          test -f public/algemene-voorwaarden/verhuur-e-chopper-nummer-1-met-kenteken-kenteken-verwijderd/index.html
+          mkdir _site
+          cp -a public/. _site/
+          rm -rf _site/private _site/.htaccess
+          find _site -name '*.php' -delete
+          echo "Bestanden: $(find _site -type f | wc -l)"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

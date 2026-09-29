@@ -105,3 +105,9 @@
 /wp-content/uploads/badass-rentals-algemene-voorwaarden-v1.2-NL.pdf
 /feed/
 /xmlrpc.php
+/post-sitemap.xml
+/category-sitemap.xml
+/author-sitemap.xml
+/blocks-sitemap.xml
+/wp-sitemap.xml
+/wp-content/uploads/badass-rentals-beneral-terms-v1.1-English.pdf

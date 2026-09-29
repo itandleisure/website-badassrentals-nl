@@ -66,7 +66,20 @@
         })
         .catch(function () {
           clearTimeout(timer);
-          HTMLFormElement.prototype.submit.call(form);  // reserveroute: verzenden.php
+          if (/verzenden\.php$/.test(form.getAttribute('action') || '')) {
+            HTMLFormElement.prototype.submit.call(form);  // reserveroute op eigen hosting: verzenden.php
+            return;
+          }
+          // Geen reserveroute (GitHub Pages): melding tonen, niets gaat stilletjes verloren
+          if (btn) { btn.disabled = false; btn.textContent = 'Opnieuw versturen'; }
+          var oud = form.querySelector('.form-msg'); if (oud) oud.remove();
+          var msg = document.createElement('div');
+          msg.className = 'form-msg err';
+          msg.setAttribute('role', 'alert');
+          msg.innerHTML = 'Het versturen is niet gelukt. Probeer het nog eens, of neem direct contact op: ' +
+            '<a href="tel:+31850047700">085 004 7700</a> of <a href="mailto:info@badassrentals.nl">info@badassrentals.nl</a>.';
+          form.prepend(msg);
+          msg.scrollIntoView({ block: 'center' });
         });
     });
   });

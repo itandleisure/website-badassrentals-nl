@@ -484,6 +484,63 @@ def vehicle_pages():
     return out
 
 
+def htaccess_rules():
+    """Leest de 301-regels uit src/root/.htaccess (regels zonder RewriteCond)."""
+    rules, cond = [], False
+    for line in (SRC / "root" / ".htaccess").read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line.startswith("RewriteCond"):
+            cond = True
+        elif line.startswith("RewriteRule"):
+            parts = line.split()
+            if not cond and len(parts) >= 3:
+                flags = parts[3] if len(parts) > 3 else ""
+                rules.append((re.compile(parts[1], re.I if "NC" in flags else 0), parts[2]))
+            cond = False
+    return rules
+
+
+def redirect_stubs():
+    """GitHub Pages kent geen .htaccess: maak op elk oud adres een doorverwijspagina.
+    De lijst oude adressen staat in tools/old-urls.txt; de bestemming komt uit .htaccess (één bron)."""
+    rules = htaccess_rules()
+    old = (ROOT / "tools" / "old-urls.txt").read_text().split()
+    old += [f"/verhuur-e-chopper-nummer-{nr}-met-kenteken-{plate.lower()}/" for nr, plate in ECHOPPERS]
+    made = 0
+    for path in dict.fromkeys(old):
+        rel = path.lstrip("/")
+        target_file = OUT / rel / "index.html" if path.endswith("/") else OUT / rel
+        if path == "/" or target_file.exists():
+            continue
+        for rx, target in rules:
+            m = rx.search(rel)
+            if not m:
+                continue
+            if target == "-":
+                break
+            target = re.sub(r"\$(\d)", lambda g: m.group(int(g.group(1))) or "", target)
+            src = OUT / target.lstrip("/")
+            if not path.endswith("/"):
+                # Bestanden (pdf, xml): een kopie op het oude adres
+                if src.is_file():
+                    target_file.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(src, target_file)
+                    made += 1
+                break
+            url = SITE + target
+            target_file.parent.mkdir(parents=True, exist_ok=True)
+            target_file.write_text(
+                f'<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>Doorverwijzing</title>'
+                f'<meta name="robots" content="noindex"><link rel="canonical" href="{url}">'
+                f'<meta http-equiv="refresh" content="0; url={target}">'
+                f'<script>location.replace("{target}"+location.hash)</script></head>'
+                f'<body><p>Deze pagina is verhuisd naar <a href="{target}">{url}</a>.</p></body></html>\n',
+                encoding="utf-8")
+            made += 1
+            break
+    return made
+
+
 VERSION = date.today().strftime("%Y%m%d")
 
 
@@ -527,6 +584,8 @@ def main():
         if meta.get("article"):
             body += related_html(path, meta.get("topic", "beleving"))
         rendered = render_shortcodes(body, meta)
+        if GOOGLE_FORM_URL:  # formulieren gaan naar Google Apps Script (GitHub Pages kent geen PHP)
+            rendered = rendered.replace('action="/verzenden.php"', f'action="{GOOGLE_FORM_URL}"')
         write_page(path, layout(meta, rendered, path))
         if not meta.get("noindex"):
             sitemap.append((path, meta.get("updated") or meta.get("date") or date.today().isoformat(),
@@ -538,7 +597,10 @@ def main():
     (OUT / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n',
         encoding="utf-8")
-    print(f"Klaar: {len(pages)} pagina's, {len(sitemap)} in sitemap -> {OUT}")
+    stubs = redirect_stubs()
+    (OUT / "CNAME").write_text("badassrentals.nl\n", encoding="utf-8")   # eigen domein voor GitHub Pages
+    (OUT / ".nojekyll").write_text("", encoding="utf-8")
+    print(f"Klaar: {len(pages)} pagina's, {len(sitemap)} in sitemap, {stubs} doorverwijzingen -> {OUT}")
 
     if "--serve" in sys.argv:
         import http.server
