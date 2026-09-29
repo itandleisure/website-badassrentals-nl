@@ -38,7 +38,12 @@ ZOEKWOORDEN = [
     "wat te doen in giethoorn",
     "arrangement giethoorn",
     "badass rentals",
+    # Duitse zoekers in Duitsland (label eindigt op " (DE)")
+    "giethoorn sehenswürdigkeiten (DE)",
+    "giethoorn boot mieten (DE)",
+    "e chopper giethoorn (DE)",
 ]
+LOCATIES = {"DE": (2276, "de")}  # label-suffix -> (location_code, language_code); standaard Nederland/nl
 MAP = Path(r"C:\Websites\badassrentals-posities")
 CSV_BESTAND = MAP / "posities.csv"
 API = "https://api.dataforseo.com/v3/serp/google/organic/live/regular"
@@ -61,8 +66,12 @@ POGINGEN = 3
 
 
 def zoek(zoekwoord, auth):
+    loc, taal = 2528, "nl"
+    if zoekwoord.endswith(")") and " (" in zoekwoord:
+        zoekwoord, land = zoekwoord[:-1].rsplit(" (", 1)
+        loc, taal = LOCATIES[land]
     body = json.dumps([{
-        "keyword": zoekwoord, "location_code": 2528, "language_code": "nl",
+        "keyword": zoekwoord, "location_code": loc, "language_code": taal,
         "device": "mobile", "depth": 100,
     }]).encode()
     kosten = 0.0
