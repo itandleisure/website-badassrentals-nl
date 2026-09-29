@@ -83,6 +83,13 @@
     });
   });
 
+  // Datumvelden met data-min-today: geen datum in het verleden kiezen
+  document.querySelectorAll('input[type="date"][data-min-today]').forEach(function (el) {
+    var d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    el.min = d.toISOString().slice(0, 10);
+  });
+
   // Link naar een antwoord in een ingeklapte FAQ (#anker): vraag openklappen
   function openHashTarget() {
     var id = decodeURIComponent(location.hash.slice(1));

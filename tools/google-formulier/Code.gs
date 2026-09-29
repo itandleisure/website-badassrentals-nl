@@ -61,6 +61,11 @@ function doPost(e) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.email)) fouten.push('email');
   if (type === 'contact' && !g.bericht) fouten.push('bericht');
   if (type === 'samenwerking' && !g.telefoon) fouten.push('telefoon');
+  if (type === 'teamuitje') {
+    if (!g.telefoon) fouten.push('telefoon');
+    if (!g.personen) fouten.push('personen');
+    if (!g.datum) fouten.push('datum');
+  }
   if (fouten.length) return antwoord({ ok: false, fout: 'velden', velden: fouten });
 
   // 1. Opslaan in de spreadsheet (slot voorkomt dat twee inzendingen tegelijk botsen)

@@ -155,9 +155,9 @@
         <div class="field"><label for="t-naam">Naam</label><input id="t-naam" name="naam" autocomplete="name" required></div>
         <div class="field"><label for="t-bedrijf">Bedrijf / groep <span class="opt">(optioneel)</span></label><input id="t-bedrijf" name="bedrijf" autocomplete="organization"></div>
         <div class="field"><label for="t-email">E-mailadres</label><input id="t-email" name="email" type="email" autocomplete="email" required></div>
-        <div class="field"><label for="t-tel">Telefoonnummer <span class="opt">(optioneel)</span></label><input id="t-tel" name="telefoon" type="tel" autocomplete="tel"></div>
-        <div class="field"><label for="t-pers">Aantal personen</label><input id="t-pers" name="personen" type="number" min="1" max="500" inputmode="numeric"></div>
-        <div class="field"><label for="t-datum">Gewenste datum <span class="opt">(optioneel)</span></label><input id="t-datum" name="datum" type="date"></div>
+        <div class="field"><label for="t-tel">Telefoonnummer</label><input id="t-tel" name="telefoon" type="tel" autocomplete="tel" required></div>
+        <div class="field"><label for="t-pers">Aantal personen</label><input id="t-pers" name="personen" type="number" min="1" max="500" inputmode="numeric" required></div>
+        <div class="field"><label for="t-datum">Gewenste datum</label><input id="t-datum" name="datum" type="date" required data-min-today></div>
         <fieldset class="field full">
           <legend>Ik heb interesse in <span class="opt">(meerdere opties mogelijk)</span></legend>
           <div class="choices">
