@@ -50,6 +50,9 @@ p{margin:0 0 1em}
 .site-nav ul{display:flex;gap:24px;list-style:none;margin:0;padding:0}
 .site-nav a:not(.btn){text-decoration:none;font-weight:600;font-size:.95rem;padding:6px 0;border-bottom:2px solid transparent}
 .site-nav a:not(.btn):hover,.site-nav a[aria-current]{border-color:var(--accent)}
+.site-nav a:not(.btn){white-space:nowrap}
+.site-nav a.lang-switch{font-weight:500;opacity:.85}
+@media (min-width:981px) and (max-width:1120px){.site-nav{gap:18px}.site-nav ul{gap:16px}}
 .nav-toggle{display:none;background:none;border:0;width:44px;height:44px;position:relative;cursor:pointer}
 .nav-toggle span:first-child,.nav-toggle span:first-child::before,.nav-toggle span:first-child::after{position:absolute;left:10px;width:24px;height:2px;background:#fff;content:"";transition:.2s}
 .nav-toggle span:first-child{top:21px}

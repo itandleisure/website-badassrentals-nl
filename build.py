@@ -60,6 +60,9 @@ BOOK = {
     "cityescape": "https://verhuur.badassrentals.nl/product/city-escape-giethoorn",
 }
 
+# Het boekingssysteem heeft een Engelse versie onder /en/
+BOOK_EN = {k: v.replace("verhuur.badassrentals.nl/", "verhuur.badassrentals.nl/en/") for k, v in BOOK.items()}
+
 NAV = [
     ("/e-chopper-huren-giethoorn/", "E-chopper"),
     ("/fat-bike-huren-in-giethoorn/", "Fatbike"),
@@ -68,6 +71,17 @@ NAV = [
     ("/veelgestelde-vragen/", "Vragen"),
     ("/kom-in-contact/", "Contact"),
 ]
+NAV_EN = [
+    ("/en/e-chopper-rental-giethoorn/", "E-chopper"),
+    ("/en/fat-bike-rental-giethoorn/", "Fat bike"),
+    ("/en/tours/", "Tours"),
+    ("/en/things-to-do-in-giethoorn/", "Things to do"),
+    ("/en/faq/", "FAQ & contact"),
+]
+
+# Engelse pagina's staan in src/pages/en/ en noemen hun Nederlandse tegenhanger in 'alternate:'.
+# Tijdens de build gevuld: pad -> {"nl": pad, "en": pad} (voor hreflang en de taalwissel)
+ALTERNATES = {}
 
 IMG_WIDTHS = (480, 960, 1600, 2000)
 PHOTO_DIMS = {}  # naam -> (breedte, hoogte, [beschikbare breedtes])
@@ -121,7 +135,8 @@ def img_tag(name, alt, sizes="100vw", cls="", eager=False):
 
 # --------------------------------------------------------------------------- shortcodes
 def render_shortcodes(body, page):
-    for k, v in BOOK.items():
+    en = page.get("lang") == "en"
+    for k, v in (BOOK_EN if en else BOOK).items():
         body = body.replace("{{book.%s}}" % k, v)
     for k, v in BUSINESS.items():
         body = body.replace("{{biz.%s}}" % k, v)
@@ -157,8 +172,8 @@ def render_shortcodes(body, page):
     body = re.sub(r"\{%\s*faq\s*%\}(.*?)\{%\s*endfaq\s*%\}", faq, body, flags=re.S)
 
     body = re.sub(r"\{%\s*reviews\s*%\}", lambda m: reviews_html(), body)
-    body = re.sub(r"\{%\s*cta\s*%\}", lambda m: cta_html(), body)
-    body = re.sub(r"\{%\s*usps\s*%\}", lambda m: usps_html(), body)
+    body = re.sub(r"\{%\s*cta\s*%\}", lambda m: cta_html(en), body)
+    body = re.sub(r"\{%\s*usps\s*%\}", lambda m: usps_html(en), body)
     body = re.sub(r"\{%\s*news\s*(\d*)\s*%\}", lambda m: news_html(int(m.group(1)) if m.group(1) else None), body)
     return body
 
@@ -190,8 +205,13 @@ def reviews_html():
             f'<p class="reviews-more"><a class="link-arrow" href="{GOOGLE_REVIEWS_URL}" rel="noopener">Bekijk alle reviews op Google</a></p>')
 
 
-def usps_html():
+def usps_html(en=False):
     items = [
+        ("30+ e-choppers & 15 fat bikes", "For couples, families and groups of any size."),
+        ("Breakdown? We come to you", "We bring a replacement right away, so you can keep going."),
+        ("The best routes", "GPS routes through Giethoorn and Weerribben-Wieden National Park."),
+        ("Well maintained", "Every e-chopper and fat bike is checked and serviced regularly."),
+    ] if en else [
         ("30+ e-choppers & 15 fatbikes", "Voor kleine en grote groepen; boven 30 personen met een wisselprogramma."),
         ("Pech onderweg? Wij komen eraan", "We regelen direct vervangend vervoer, zodat je snel weer verder kunt."),
         ("Mooiste routes", "GPS-routes door Giethoorn en Nationaal Park Weerribben-Wieden."),
@@ -200,7 +220,20 @@ def usps_html():
     return '<ul class="usps">' + "".join(f"<li><strong>{a}</strong><span>{b}</span></li>" for a, b in items) + "</ul>"
 
 
-def cta_html():
+def cta_html(en=False):
+    if en:
+        return f"""<section class="cta-band">
+  <div class="wrap cta-band-inner">
+    <div>
+      <h2>Ready to ride?</h2>
+      <p>Pick your date and time and book online.</p>
+    </div>
+    <div class="btn-row">
+      <a class="btn btn-accent" href="{BOOK_EN['echopper']}">Book an e-chopper</a>
+      <a class="btn btn-ghost-light" href="{BOOK_EN['fatbike']}">Book a fat bike</a>
+    </div>
+  </div>
+</section>"""
     return f"""<section class="cta-band">
   <div class="wrap cta-band-inner">
     <div>
@@ -253,9 +286,9 @@ def related_html(path, topic):
 
 
 # --------------------------------------------------------------------------- layout
-def nav_html(path):
+def nav_html(path, en=False):
     items = []
-    for href, label in NAV:
+    for href, label in (NAV_EN if en else NAV):
         cur = ' aria-current="page"' if path.startswith(href) else ""
         items.append(f'<li><a href="{href}"{cur}>{label}</a></li>')
     return "".join(items)
@@ -288,102 +321,8 @@ def local_business_schema():
     }
 
 
-def layout(page, body, path):
-    title = page["title"]
-    desc = page.get("description", "")
-    canonical = SITE + path
-    og_img = SITE + f"/assets/img/{page.get('image', 'groep-e-choppers-fatbikes-giethoorn')}-og.jpg"
-    robots = "noindex, follow" if page.get("noindex") else "index, follow, max-image-preview:large"
-
-    schemas = [local_business_schema()] if path == "/" else []
-    if page.get("crumb") and path != "/":
-        crumbs = [{"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"}]
-        if page.get("parent"):
-            p_url, p_name = page["parent"].split("|")
-            crumbs.append({"@type": "ListItem", "position": 2, "name": p_name, "item": SITE + p_url})
-        crumbs.append({"@type": "ListItem", "position": len(crumbs) + 1, "name": page["crumb"], "item": canonical})
-        schemas.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": crumbs})
-    if page.get("_faq") and page.get("faq_schema"):
-        schemas.append({
-            "@context": "https://schema.org", "@type": "FAQPage",
-            "mainEntity": [{"@type": "Question", "name": q,
-                            "acceptedAnswer": {"@type": "Answer", "text": re.sub(r"<[^>]+>", "", a).strip()}}
-                           for q, a in page["_faq"]],
-        })
-    if page.get("article"):
-        schemas.append({
-            "@context": "https://schema.org", "@type": "BlogPosting",
-            "headline": page["h1"] if page.get("h1") else title, "description": desc,
-            "image": og_img, "datePublished": page["date"], "dateModified": page.get("updated", page["date"]),
-            "author": {"@type": "Organization", "name": "Badass Rentals"},
-            "publisher": {"@id": SITE + "/#business"}, "mainEntityOfPage": canonical,
-        })
-    schema_html = "".join(
-        f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>' for s in schemas
-    )
-    crumb_html = ""
-    if page.get("crumb") and path != "/":
-        mid = ""
-        if page.get("parent"):
-            p_url, p_name = page["parent"].split("|")
-            mid = f'<li><a href="{p_url}">{p_name}</a></li>'
-        crumb_html = (f'<nav class="crumbs wrap" aria-label="Kruimelpad"><ol><li><a href="/">Home</a></li>{mid}'
-                      f'<li aria-current="page">{page["crumb"]}</li></ol></nav>')
-
-    body_class = page.get("body_class", "")
-    return f"""<!doctype html>
-<html lang="nl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)}</title>
-<meta name="description" content="{html.escape(desc)}">
-<meta name="robots" content="{robots}">
-<link rel="canonical" href="{canonical}">
-<meta property="og:type" content="{'article' if page.get('article') else 'website'}">
-<meta property="og:locale" content="nl_NL">
-<meta property="og:site_name" content="Badass Rentals">
-<meta property="og:title" content="{html.escape(page.get('og_title', title))}">
-<meta property="og:description" content="{html.escape(desc)}">
-<meta property="og:url" content="{canonical}">
-<meta property="og:image" content="{og_img}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#111111">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="preload" href="/assets/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/site.css?v={VERSION}">
-{schema_html}
-</head>
-<body class="{body_class}"{f' data-google-form="{GOOGLE_FORM_URL}"' if GOOGLE_FORM_URL else ""}>
-<a class="skip" href="#main">Direct naar de inhoud</a>
-<div class="topbar"><div class="wrap topbar-inner">
-  <span>Start bij {BUSINESS['location']}, {BUSINESS['street']} in {BUSINESS['city']}</span>
-  <span class="topbar-links"><a href="tel:{BUSINESS['phone']}">{BUSINESS['phone_display']}</a><a href="mailto:{BUSINESS['email']}">{BUSINESS['email']}</a></span>
-</div></div>
-<header class="site-header">
-  <div class="wrap header-inner">
-    <a class="brand" href="/" aria-label="Badass Rentals, naar de homepage">
-      <img src="/assets/brand/logo-white.webp" width="56" height="56" alt="Badass Rentals logo">
-      <span>Badass<br>Rentals</span>
-    </a>
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav"><span></span><span class="sr">Menu</span></button>
-    <nav id="site-nav" class="site-nav" aria-label="Hoofdmenu">
-      <ul>{nav_html(path)}</ul>
-      <a class="btn btn-accent btn-sm" href="{BOOK['root']}">Reserveren</a>
-    </nav>
-  </div>
-</header>
-{crumb_html}
-<main id="main">
-{body}
-</main>
-<footer class="site-footer">
+def footer_nl():
+    return f"""<footer class="site-footer">
   <div class="wrap footer-grid">
     <div>
       <img src="/assets/brand/logo-white.webp" width="72" height="72" alt="" loading="lazy">
@@ -429,7 +368,172 @@ def layout(page, body, path):
     <span>&copy; 2021 - {date.today().year} Badass Rentals</span>
     <span><a href="/algemene-voorwaarden/">Algemene voorwaarden</a><a href="/privacyverklaring/">Privacyverklaring</a><a href="/veelgestelde-vragen/">Veelgestelde vragen</a></span>
   </div>
-</footer>
+</footer>"""
+
+
+def footer_en():
+    return f"""<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div>
+      <img src="/assets/brand/logo-white.webp" width="72" height="72" alt="" loading="lazy">
+      <p>E-chopper and electric fat bike rental in Giethoorn. Ride through Weerribben-Wieden National Park, just the two of you or with your whole group.</p>
+      <p class="social"><a href="{BUSINESS['facebook']}" rel="noopener">Facebook</a><a href="{BUSINESS['instagram']}" rel="noopener">Instagram</a></p>
+    </div>
+    <div>
+      <h2>Book online</h2>
+      <ul>
+        <li><a href="{BOOK_EN['echopper']}">Book an e-chopper</a></li>
+        <li><a href="{BOOK_EN['fatbike']}">Book a fat bike</a></li>
+        <li><a href="{BOOK_EN['ontdek']}">Discover Giethoorn &amp; Weerribben tour</a></li>
+        <li><a href="{BOOK_EN['evening']}">Evening Chopper Tour</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Explore</h2>
+      <ul>
+        <li><a href="/en/">E-chopper &amp; fat bike rental</a></li>
+        <li><a href="/en/e-chopper-rental-giethoorn/">E-chopper rental in Giethoorn</a></li>
+        <li><a href="/en/fat-bike-rental-giethoorn/">Fat bike rental in Giethoorn</a></li>
+        <li><a href="/en/tours/">Giethoorn tours: e-chopper &amp; boat</a></li>
+        <li><a href="/en/things-to-do-in-giethoorn/">Things to do in Giethoorn</a></li>
+        <li><a href="/en/faq/">FAQ &amp; contact</a></li>
+        <li><a href="/" hreflang="nl" lang="nl">Nederlandse website</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Contact</h2>
+      <address>
+        {BUSINESS['name']}<br>
+        Meeting point: {BUSINESS['location']}<br>
+        {BUSINESS['street']}, {BUSINESS['postal']} {BUSINESS['city']}, the Netherlands<br>
+        <a href="tel:{BUSINESS['phone']}">+31 85 004 7700</a><br>
+        <a href="mailto:{BUSINESS['email']}">{BUSINESS['email']}</a>
+      </address>
+      <p><a class="link-arrow" href="{BUSINESS['maps']}" rel="noopener">Get directions</a></p>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>&copy; 2021 - {date.today().year} Badass Rentals</span>
+    <span><a href="/algemene-voorwaarden/" hreflang="nl">Terms and conditions (Dutch)</a><a href="/privacyverklaring/" hreflang="nl">Privacy policy (Dutch)</a><a href="/en/faq/">FAQ</a></span>
+  </div>
+</footer>"""
+
+
+LABELS = {
+    "nl": {"skip": "Direct naar de inhoud", "start": "Start bij", "in": "in", "home": "/", "crumbs": "Kruimelpad",
+           "brand": "Badass Rentals, naar de homepage", "menu": "Hoofdmenu", "book": "Reserveren"},
+    "en": {"skip": "Skip to content", "start": "Meeting point:", "in": "in", "home": "/en/", "crumbs": "Breadcrumb",
+           "brand": "Badass Rentals, to the homepage", "menu": "Main menu", "book": "Book now"},
+}
+
+
+def layout(page, body, path):
+    title = page["title"]
+    desc = page.get("description", "")
+    canonical = SITE + path
+    og_img = SITE + f"/assets/img/{page.get('image', 'groep-e-choppers-fatbikes-giethoorn')}-og.jpg"
+    robots = "noindex, follow" if page.get("noindex") else "index, follow, max-image-preview:large"
+
+    en = page.get("lang") == "en"
+    T = LABELS["en" if en else "nl"]
+    schemas = [local_business_schema()] if path == "/" else []
+    if page.get("crumb") and path != "/":
+        crumbs = [{"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"}]
+        if page.get("parent"):
+            p_url, p_name = page["parent"].split("|")
+            crumbs.append({"@type": "ListItem", "position": 2, "name": p_name, "item": SITE + p_url})
+        crumbs.append({"@type": "ListItem", "position": len(crumbs) + 1, "name": page["crumb"], "item": canonical})
+        schemas.append({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": crumbs})
+    if page.get("_faq") and page.get("faq_schema"):
+        schemas.append({
+            "@context": "https://schema.org", "@type": "FAQPage",
+            "mainEntity": [{"@type": "Question", "name": q,
+                            "acceptedAnswer": {"@type": "Answer", "text": re.sub(r"<[^>]+>", "", a).strip()}}
+                           for q, a in page["_faq"]],
+        })
+    if page.get("article"):
+        schemas.append({
+            "@context": "https://schema.org", "@type": "BlogPosting",
+            "headline": page["h1"] if page.get("h1") else title, "description": desc,
+            "image": og_img, "datePublished": page["date"], "dateModified": page.get("updated", page["date"]),
+            "author": {"@type": "Organization", "name": "Badass Rentals"},
+            "publisher": {"@id": SITE + "/#business"}, "mainEntityOfPage": canonical,
+        })
+    schema_html = "".join(
+        f'<script type="application/ld+json">{json.dumps(s, ensure_ascii=False)}</script>' for s in schemas
+    )
+    crumb_html = ""
+    if page.get("crumb") and path != "/":
+        mid = ""
+        if page.get("parent"):
+            p_url, p_name = page["parent"].split("|")
+            mid = f'<li><a href="{p_url}">{p_name}</a></li>'
+        crumb_html = (f'<nav class="crumbs wrap" aria-label="{T["crumbs"]}"><ol><li><a href="{T["home"]}">Home</a></li>{mid}'
+                      f'<li aria-current="page">{page["crumb"]}</li></ol></nav>')
+
+    body_class = page.get("body_class", "")
+    alt = ALTERNATES.get(path, {})
+    hreflang = ""
+    if alt.get("en"):
+        hreflang = (f'<link rel="alternate" hreflang="nl" href="{SITE}{alt["nl"]}">\n'
+                    f'<link rel="alternate" hreflang="en" href="{SITE}{alt["en"]}">\n'
+                    f'<link rel="alternate" hreflang="x-default" href="{SITE}{alt["nl"]}">\n')
+    other = alt.get("nl" if en else "en") or ("/" if en else "/en/")
+    switch = (f'<li><a class="lang-switch" href="{other}" title="{"Nederlands" if en else "English"}" aria-label="{"Nederlands" if en else "English"}" hreflang="{"nl" if en else "en"}" lang="{"nl" if en else "en"}">'
+              f'{"NL" if en else "EN"}</a></li>')
+    return f"""<!doctype html>
+<html lang="{"en" if en else "nl"}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{html.escape(title)}</title>
+<meta name="description" content="{html.escape(desc)}">
+<meta name="robots" content="{robots}">
+<link rel="canonical" href="{canonical}">
+{hreflang}<meta property="og:type" content="{'article' if page.get('article') else 'website'}">
+<meta property="og:locale" content="{"en_GB" if en else "nl_NL"}">
+<meta property="og:site_name" content="Badass Rentals">
+<meta property="og:title" content="{html.escape(page.get('og_title', title))}">
+<meta property="og:description" content="{html.escape(desc)}">
+<meta property="og:url" content="{canonical}">
+<meta property="og:image" content="{og_img}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#111111">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/brand/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="/assets/fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v={VERSION}">
+{schema_html}
+</head>
+<body class="{body_class}"{f' data-google-form="{GOOGLE_FORM_URL}"' if GOOGLE_FORM_URL else ""}>
+<a class="skip" href="#main">{T["skip"]}</a>
+<div class="topbar"><div class="wrap topbar-inner">
+  <span>{T['start']} {BUSINESS['location']}, {BUSINESS['street']} {T['in']} {BUSINESS['city']}</span>
+  <span class="topbar-links"><a href="tel:{BUSINESS['phone']}">{BUSINESS['phone_display']}</a><a href="mailto:{BUSINESS['email']}">{BUSINESS['email']}</a></span>
+</div></div>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="{T["home"]}" aria-label="{T["brand"]}">
+      <img src="/assets/brand/logo-white.webp" width="56" height="56" alt="Badass Rentals logo">
+      <span>Badass<br>Rentals</span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav"><span></span><span class="sr">Menu</span></button>
+    <nav id="site-nav" class="site-nav" aria-label="{T["menu"]}">
+      <ul>{nav_html(path, en)}{switch}</ul>
+      <a class="btn btn-accent btn-sm" href="{(BOOK_EN if en else BOOK)['root']}">{T["book"]}</a>
+    </nav>
+  </div>
+</header>
+{crumb_html}
+<main id="main">
+{body}
+</main>
+{footer_en() if en else footer_nl()}
 <script src="/assets/js/site.js?v={VERSION}" defer></script>
 </body>
 </html>
@@ -547,9 +651,15 @@ def main():
     shutil.copy2(SRC / "assets" / "brand" / "favicon.ico", OUT / "favicon.ico")
 
     pages = []
-    for f in sorted((SRC / "pages").glob("*.html")):
+    for f in sorted((SRC / "pages").glob("*.html")) + sorted((SRC / "pages" / "en").glob("*.html")):
         meta, body = parse_page(f.read_text(encoding="utf-8"))
-        pages.append((page_path(f), meta, body))
+        path = page_path(f)
+        if f.parent.name == "en":
+            meta["lang"] = "en"
+            path = "/en" + path
+            if meta.get("alternate"):
+                ALTERNATES[path] = ALTERNATES[meta["alternate"]] = {"nl": meta["alternate"], "en": path}
+        pages.append((path, meta, body))
         if meta.get("article"):
             NEWS.append((page_path(f), meta.get("h1", meta["title"]), meta["description"], meta["image"], meta["date"],
                          meta.get("topic", "beleving")))
