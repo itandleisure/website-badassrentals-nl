@@ -144,6 +144,9 @@ switch ($type) {
             'Telefoon'        => $phone,
             'Bericht'         => field('bericht', 5000),
         ];
+        if ($phone === '') {
+            $errors[] = 'telefoon';
+        }
         $subject = FORMS[$type]['subject'] . ': ' . ($lines['Bedrijf'] ?: $name);
         break;
 

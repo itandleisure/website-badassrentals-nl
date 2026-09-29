@@ -43,12 +43,12 @@ priority: 0.6
       <div class="hp" aria-hidden="true"><label>Laat dit veld leeg <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
       <div class="form-grid">
         <div class="field"><label for="s-naam">Naam</label><input id="s-naam" name="naam" autocomplete="name" required></div>
-        <div class="field"><label for="s-bedrijf">Bedrijfsnaam</label><input id="s-bedrijf" name="bedrijf" autocomplete="organization"></div>
+        <div class="field"><label for="s-bedrijf">Bedrijfsnaam <span class="opt">(optioneel)</span></label><input id="s-bedrijf" name="bedrijf" autocomplete="organization"></div>
         <div class="field"><label for="s-type">Type bedrijf</label>
           <select id="s-type" name="type_bedrijf"><option value="">Maak een keuze</option><option>Camping</option><option>Bed &amp; breakfast</option><option>Hotel</option><option>Restaurant</option><option>Vakantiepark</option><option>Ander bedrijf</option></select></div>
-        <div class="field"><label for="s-site">Website <span class="opt">(optioneel)</span></label><input id="s-site" name="site" type="url" placeholder="https://"></div>
+        <div class="field"><label for="s-site">Website <span class="opt">(optioneel)</span></label><input id="s-site" name="site" type="text" inputmode="url" autocomplete="url" placeholder="www.jouwbedrijf.nl"></div>
         <div class="field"><label for="s-email">E-mailadres</label><input id="s-email" name="email" type="email" autocomplete="email" required></div>
-        <div class="field"><label for="s-tel">Telefoonnummer <span class="opt">(optioneel)</span></label><input id="s-tel" name="telefoon" type="tel" autocomplete="tel"></div>
+        <div class="field"><label for="s-tel">Telefoonnummer</label><input id="s-tel" name="telefoon" type="tel" autocomplete="tel" required></div>
         <div class="field full"><label for="s-bericht">Hoe kunnen we je helpen? <span class="opt">(optioneel)</span></label><textarea id="s-bericht" name="bericht"></textarea></div>
       </div>
       <p style="margin-top:18px"><button class="btn btn-accent" type="submit">Versturen</button></p>
