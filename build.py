@@ -505,6 +505,18 @@ LABELS = {
     "de": {"skip": "Direkt zum Inhalt", "start": "Treffpunkt:", "in": "in", "home": "/de/", "crumbs": "Brotkrümelnavigation",
            "brand": "Badass Rentals, zur Startseite", "menu": "Hauptmenü", "book": "Jetzt buchen", "locale": "de_DE"},
 }
+# Vlaggetjes voor de taalwissel als inline SVG (vlag-emoji's werken niet op Windows)
+FLAGS = {
+    "nl": '<svg class="flag" viewBox="0 0 9 6" aria-hidden="true"><rect width="9" height="6" fill="#21468B"/>'
+          '<rect width="9" height="4" fill="#fff"/><rect width="9" height="2" fill="#AE1C28"/></svg>',
+    "de": '<svg class="flag" viewBox="0 0 5 3" aria-hidden="true"><rect width="5" height="3" fill="#FFCE00"/>'
+          '<rect width="5" height="2" fill="#D00"/><rect width="5" height="1" fill="#000"/></svg>',
+    "en": '<svg class="flag" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice" aria-hidden="true">'
+          '<clipPath id="flag-uk-t"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath>'
+          '<rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/>'
+          '<path d="M0,0 60,30M60,0 0,30" clip-path="url(#flag-uk-t)" stroke="#C8102E" stroke-width="4"/>'
+          '<path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></svg>',
+}
 FOOTERS = {"nl": lambda: footer_nl(), "en": lambda: footer_en(), "de": lambda: footer_de()}
 
 
@@ -561,7 +573,7 @@ def layout(page, body, path):
     names = {"nl": "Nederlands", "en": "English", "de": "Deutsch"}
     switch = "".join(
         f'<li><a class="lang-switch" href="{alt.get(l) or LABELS[l]["home"]}" title="{names[l]}" aria-label="{names[l]}" '
-        f'hreflang="{l}" lang="{l}">{l.upper()}</a></li>' for l in LANGS if l != lang)
+        f'hreflang="{l}" lang="{l}">{FLAGS[l]}{l.upper()}</a></li>' for l in LANGS if l != lang)
     return f"""<!doctype html>
 <html lang="{lang}">
 <head>

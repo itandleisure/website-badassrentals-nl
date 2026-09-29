@@ -51,7 +51,8 @@ p{margin:0 0 1em}
 .site-nav a:not(.btn){text-decoration:none;font-weight:600;font-size:.95rem;padding:6px 0;border-bottom:2px solid transparent}
 .site-nav a:not(.btn):hover,.site-nav a[aria-current]{border-color:var(--accent)}
 .site-nav a:not(.btn){white-space:nowrap}
-.site-nav a.lang-switch{font-weight:500;opacity:.85}
+.site-nav a.lang-switch{font-weight:500;display:flex;align-items:center;gap:7px}
+.flag{width:21px;height:14px;flex:none;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.3)}
 @media (min-width:981px) and (max-width:1120px){.site-nav{gap:18px}.site-nav ul{gap:16px}}
 .nav-toggle{display:none;background:none;border:0;width:44px;height:44px;position:relative;cursor:pointer}
 .nav-toggle span:first-child,.nav-toggle span:first-child::before,.nav-toggle span:first-child::after{position:absolute;left:10px;width:24px;height:2px;background:#fff;content:"";transition:.2s}
