@@ -92,7 +92,8 @@ De reviews staan in `build.py` (lijst `REVIEWS`): echte 5-sterren Google-reviews
 
 De digitale huurovereenkomsten (QR-codes op de voertuigen) worden niet meer gebruikt. De oude adressen
 (`/algemene-voorwaarden/verhuur-e-chopper-...`) sturen door naar de algemene voorwaarden.
-`/qrcode/`, `/qr-code-nederlands|engels|duits/` en `/instagram/` bestaan nog wel.
+De QR-keuzepagina's (`/qrcode/`, `/qr-code-nederlands|engels|duits/`) zijn ook weg en sturen door naar de homepage.
+`/instagram/` bestaat nog wel: die pagina hangt aan het Instagram-account (link in bio).
 
 ## Controles
 

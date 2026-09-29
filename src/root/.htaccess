@@ -19,6 +19,8 @@ RewriteCond %{REQUEST_URI} !/$
 RewriteRule ^(.*)$ /$1/ [R=301,L]
 
 # ---- Oude WordPress-URL's -> nieuwe pagina's (301) ----
+# QR-keuzepagina's (niet meer in gebruik) -> homepage
+RewriteRule ^(qrcode|qr-code-nederlands|qr-code-engels|qr-code-duits)/?$ / [R=301,L,NC]
 # Digitale huurovereenkomsten (QR-codes) worden niet meer gebruikt -> algemene voorwaarden
 RewriteRule ^(algemene-voorwaarden/)?(verhuur-e-chopper-nummer-[0-9]+-met-kenteken-[a-z0-9-]+|verhuur-fatbikes-algemene-voorwaarden)/?$ /algemene-voorwaarden/ [R=301,L,NC]
 RewriteRule ^huurovereenkomst-ontvangen/?$ /algemene-voorwaarden/ [R=301,L,NC]

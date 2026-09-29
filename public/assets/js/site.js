@@ -48,7 +48,6 @@
       var googleUrl = document.body.getAttribute('data-google-form');
       if (!googleUrl || !window.fetch || !window.AbortController) return;
       e.preventDefault();
-      var type = (form.querySelector('input[name="form"]') || {}).value;
       var bedankt = '/bedankt/';
       var stop = new AbortController();
       var timer = setTimeout(function () { stop.abort(); }, 15000);

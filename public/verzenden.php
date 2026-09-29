@@ -6,7 +6,6 @@
  *   contact           Contactformulier
  *   teamuitje         Aanvraag teamuitje / arrangement op maat
  *   samenwerking      Samenwerkingsaanvraag (camping, hotel, B&B ...)
- *   huurovereenkomst  Digitale huurovereenkomst via QR-code op een voertuig
  *
  * Spambescherming: honeypot-veld "website" + minimale invultijd via "duur" (ms, gemeten in de browser).
  * Werkt met PHP mail(). Komen mails niet aan? Laat de hoster SPF/DKIM voor
@@ -23,7 +22,6 @@ const FORMS = [
     'contact'          => ['subject' => 'Contactformulier',         'back' => '/kom-in-contact/',         'thanks' => '/bedankt/'],
     'teamuitje'        => ['subject' => 'Aanvraag teamuitje',       'back' => '/teamuitje-met-echopper/', 'thanks' => '/bedankt/'],
     'samenwerking'     => ['subject' => 'Aanvraag samenwerking',    'back' => '/samenwerking/',           'thanks' => '/bedankt/'],
-    'huurovereenkomst' => ['subject' => 'Huurovereenkomst getekend','back' => null,                       'thanks' => '/huurovereenkomst-ontvangen/'],
 ];
 
 function field(string $key, int $max = 2000): string
@@ -71,27 +69,6 @@ function send_mail(string $subject, string $body, string $replyTo = '', string $
     );
 }
 
-function store_agreement(array $row): void
-{
-    // Bewaar een kopie van getekende huurovereenkomsten buiten het zicht van bezoekers.
-    $dir = dirname(__DIR__) . '/huurovereenkomsten';
-    if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
-        $dir = __DIR__ . '/private';
-        if (!is_dir($dir)) {
-            @mkdir($dir, 0750, true);
-        }
-    }
-    $file = $dir . '/huurovereenkomsten-' . date('Y') . '.csv';
-    $new = !file_exists($file);
-    if ($fh = @fopen($file, 'ab')) {
-        if ($new) {
-            fputcsv($fh, array_keys($row), ';');
-        }
-        fputcsv($fh, array_values($row), ';');
-        fclose($fh);
-    }
-}
-
 // ---------------------------------------------------------------------------
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -106,7 +83,7 @@ if (!isset(FORMS[$type])) {
 }
 $cfg  = FORMS[$type];
 $page = field('page', 200);
-$back = $cfg['back'] ?? (preg_match('#^/[a-z0-9\-/]+$#', $page) ? $page : '/');
+$back = $cfg['back'];
 
 // Spam: honeypot gevuld of binnen 3 seconden na openen verstuurd -> doen alsof het gelukt is.
 // "duur" is de invultijd in milliseconden, gemeten in de browser (onafhankelijk van de klok).
@@ -170,34 +147,6 @@ switch ($type) {
         $subject = FORMS[$type]['subject'] . ': ' . ($lines['Bedrijf'] ?: $name);
         break;
 
-    case 'huurovereenkomst':
-        $vehicle = one_line(field('voertuig', 120));
-        $start   = one_line(field('start', 40));
-        $akkoord = field('akkoord', 10) === 'ja';
-        $afkoop  = field('afkoop', 10) === 'ja';
-        if ($vehicle === '') {
-            $errors[] = 'voertuig';
-        }
-        if ($phone === '') {
-            $errors[] = 'telefoon';
-        }
-        if (!$akkoord) {
-            $errors[] = 'akkoord';
-        }
-        $lines = [
-            'Voertuig'                  => $vehicle,
-            'Naam huurder'              => $name,
-            'E-mail'                    => $email,
-            'Telefoon'                  => $phone,
-            'Start verhuur'             => $start,
-            'Akkoord voorwaarden'       => $akkoord ? 'Ja' : 'Nee',
-            'Afkoopregeling afgenomen'  => $afkoop ? 'Ja' : 'Nee',
-            'Versie voorwaarden'        => one_line(field('versie', 40)),
-            'Verstuurd op'              => date('d-m-Y H:i:s'),
-            'IP-adres'                  => $_SERVER['REMOTE_ADDR'] ?? '',
-        ];
-        $subject = FORMS[$type]['subject'] . ': ' . $vehicle . ' - ' . $name;
-        break;
 }
 
 if ($errors) {
@@ -212,10 +161,6 @@ foreach ($lines as $label => $value) {
     $body .= (strpos($value, "\n") !== false ? "{$label}:\n{$value}\n\n" : "{$label}: {$value}\n");
 }
 $body .= "\n--\nVerstuurd via " . ($page ?: $back) . ' op badassrentals.nl';
-
-if ($type === 'huurovereenkomst') {
-    store_agreement($lines);
-}
 
 $ok = send_mail(one_line($subject), $body, $email, $name);
 go($ok ? $cfg['thanks'] : $back . '?fout=mail#formulier');
