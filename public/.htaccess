@@ -33,9 +33,11 @@ RewriteRule ^virtual-reality-escape-games/.*$ /arrangementen/ [R=301,L,NC]
 RewriteRule ^blocks/.*$ / [R=301,L,NC]
 RewriteRule ^(tag|product|product-category)/.*$ / [R=301,L,NC]
 # Homepage-varianten en verdwenen landingspagina's
-RewriteRule ^(echopper-verhuur-giethoorn|badassrentals-homepagina|begin-je-badass-ride-in-giethoorn|begin-je-badass-ride-in-blokzijl|begin-je-badass-ride-in-emmeloord|echopper-rental-cast-horn|bakfiets-huren-in-giethoorn-3|media|badass-chopper-game|leaderboard)/?$ / [R=301,L,NC]
+RewriteRule ^(echopper-verhuur-giethoorn|badassrentals-homepagina|begin-je-badass-ride-in-giethoorn|begin-je-badass-ride-in-blokzijl|begin-je-badass-ride-in-emmeloord|echopper-rental-cast-horn|media|badass-chopper-game|leaderboard)/?$ / [R=301,L,NC]
+# Fietsverhuur (oude e-bike- en bakfietspagina's)
+RewriteRule ^(e-bike-huren-giethoorn|bakfiets-huren-in-giethoorn-3)/?$ /fiets-huren-giethoorn/ [R=301,L,NC]
 # E-chopper-varianten
-RewriteRule ^(e-bike-huren-giethoorn|electrische-scooter-giethoorn|e-chopper-huren-overijssel|e-chopper-weerribben|e-chopper-drenthe|e-chopper-huren-in-blokzijl|prijzen)/?$ /e-chopper-huren-giethoorn/ [R=301,L,NC]
+RewriteRule ^(electrische-scooter-giethoorn|e-chopper-huren-overijssel|e-chopper-weerribben|e-chopper-drenthe|e-chopper-huren-in-blokzijl|prijzen)/?$ /e-chopper-huren-giethoorn/ [R=301,L,NC]
 # Teamuitjes
 RewriteRule ^(bedrijfsuitje-meppel)/?$ /teamuitje-met-echopper/ [R=301,L,NC]
 # Arrangementen
